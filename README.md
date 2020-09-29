@@ -13,8 +13,8 @@
 
 
 
- 
-`例如 email+结束符  自动出来 cmyistu@gmail.com。` 
+ <center>`例如 email+结束符  它会替换成 cmyistu@gmail.com。` </center>
+
 <br>
 这个结束符可以自己设置，我把结束符更改成了 tab 和 撇号，避开了空格。默认情况下是空格、句号、回车结尾才会触发，详情见官网，你可以的结束符有： #Hotstring EndChars -()[]{}:;'"/\,.?!`n `t  。
 
