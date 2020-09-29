@@ -113,14 +113,14 @@ global StartTime:= 0
 
 :ok10:email::c15601360539@gmail.com
 :ok10:youxiang::15601360539@163.com
-:ok10:mima::john_cenam
+:ok10:mima::john_cena
 
-:ok10:qq::1410046075
-:ok10:shouji::15601360539
-:ok10:dizhi::北京市石景山区古城路2栋80号   北京市石景山区古城路2栋5单元501
-:ok10:k4::kanriluo04
-:ok10:k6::w6789e7890
-:ok10:sfz::110107199801120333
+:ok10:qq::14xxxxxxxxxxxxxxxx
+:ok10:shouji::15xxxxxx60539
+:ok10:dizhi::北京市石景山区xxxx路xx栋xx0号   北京市石景山区古城路xxxx栋xx单元xxxx
+:ok10:k4::xxxxxkanxxxxxxx
+:ok10:k6::w67xxxxxxxxxxxx
+:ok10:sfz::1xxxxxxxxxxxxx0333
 :ok10:jiji::基极
 :ok10:jidianji::集电极
 :ok10:bji:: 基极
@@ -143,7 +143,7 @@ Esc & 6::⁶
 Esc & 7::⁷
 Esc & 8::⁸
 Esc & 9::⁹
-; 很难去按组合热键, 三个键的组合键doesn't work
+; 很难去按组合热键, 三个键的组合键，esc+ shift +  = 不等于 esc+ "+",  doesn't work
 Esc & \::⁺
 Esc & f9::⁺
 Esc & f10::⁻
@@ -203,7 +203,7 @@ F1 & 6::₆
 F1 & 7::₇
 F1 & 8::₈
 F1 & 9::₉
-; 很难去按组合热键, doesn't work
+; 很难去按组合热键, 三个键的组合键，f1+ shift +  = 不等于 f1+ "+",  doesn't work
 F1 & Backspace::₊
 F1 & -::₋ 
 F1 & =::₌ 
