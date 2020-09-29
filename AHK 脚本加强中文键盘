@@ -1,11 +1,14 @@
+;这个脚本控制着语言切换和快速输入数学符号，两个功能。 使用方法：可以直接新建 txt，然后更名为 xxx.ahk，复制全部代码，运行即可使用。说明见 readme
+
+
+;-------------------------------------------------------------------------------------------------------------
 ;环境设置
-;这个脚本控制着语言切换和快速输入数学符号，两个功能。
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetCapsLockState, AlwaysOff  
-;声明全局变量，这样函数才能看见这个变量。ahk对普通变量的访问权限设限，比较麻烦，例如要时钟记录当前语言的状态，就必须得用global变量。
+; 没啥用，这里可以删。用几个变量为脚本增加一些功能，但是这些功能都太复杂，例如点 3 次某个键， 点 4 次某个键，触发什么什么功能，最后我都删了，因为自己都记不住。
 global using_keyboard_controlling_mouse:=0                                                                                                                                                                                                            
 global using_shift_to_help_typing_in_Chinese:=1 
 global Caps_Times:= 0        
