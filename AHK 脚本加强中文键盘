@@ -1,0 +1,513 @@
+;环境设置
+;这个脚本控制着语言切换和快速输入数学符号，两个功能。
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#Warn  ; Enable warnings to assist with detecting common errors.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+SetCapsLockState, AlwaysOff  
+;声明全局变量，这样函数才能看见这个变量。ahk对普通变量的访问权限设限，比较麻烦，例如要时钟记录当前语言的状态，就必须得用global变量。
+global using_keyboard_controlling_mouse:=0                                                                                                                                                                                                            
+global using_shift_to_help_typing_in_Chinese:=1 
+global Caps_Times:= 0        
+global StartTime:= 0
+;-------------------------------------------------------------------------------------------------------------
+
+
+
+
+;自定义短语 αβγδκλμνξπρρστυφχψωθ
+;( ⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ⁺⁻⁼ ⁽ ⁾ ₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉ ₊ ₋ ₌ ₍ ₎ ), 
+;a full superscript Latin lowercase alphabet except q ( ᵃ ᵇ ᶜ ᵈ ᵉ ᶠ ᵍ ʰ ⁱ ʲ ᵏ ˡ ᵐ ⁿ ᵒ ᵖ ʳ ˢ ᵗ ᵘ ᵛ ʷ ˣ ʸ ᶻ ), 
+;a limited uppercase Latin alphabet ( ᴬ ᴮ ᴰ ᴱ ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ ᴿ ᵀ ᵁ ⱽ ᵂ ), 
+;a few subscripted lowercase letters ( ₐ ₑ ₕ ᵢ ⱼ ₖ ₗ ₘ ₙ ₒ ₚ ᵣ ₛ ₜ ᵤ ᵥ ₓ ), 
+;and some Greek letters ( ᵅ ᵝ ᵞ ᵟ ᵋ ᶿ ᶥ ᶲ ᵠ ᵡ ᵦ ᵧ ᵨ ᵩ ᵪ ).
+
+#UseHook On
+
+; https://en.wikipedia.org/wiki/Beta_Code
+; 详情如何使用请见 https://github.com/scullion/greek.ahk/blob/master/greek.ahk
+; 简单地说，字母加esc 底下的撇号，例如c~ 会自动变成 ξ ，a~ 变成α ，G~大写 shift g ` 变成 Γ
+
+#Hotstring EndChars `t``
+; 上一句话将 空格触发变成了 tab 和 撇好触发 hotstring。 例如 hotstring 是 a，那么 a~ （加的撇号）会变成 α  , k~ κ l~ λ  见 ahk 的官网， #Hotstring EndChars -()[]{}:;'"/\,.?!`n `t  结束符设置什么都行。
+; 添加o 代表最后的撇号、Tab会被省略。
+; 添加C 代表区分大小写，这样能完整的映射希腊大小写。
+
+:oC:a::α ; lower case alpha
+:oC:b::β ; lower case beta
+:oC:c::ξ ; lower case xi
+:oC:d::δ ; lower case delta
+:oC:e::ε ; lower case epsilon
+:oC:f::φ ; lower case phi
+:oC:g::γ ; lower case gamma
+:oC:h::η ; lower case eta
+:oC:i::ι ; lower case iota
+:oC:k::κ ; lower case kappa
+:oC:l::λ ; lower case lambda
+:oC:m::μ ; lower case mu
+:oC:n::ν ; lower case nu
+:oC:o::ο ; lower case omicron
+:oC:p::π ; lower case pi
+:oC:q::θ ; lower case theta
+:oC:r::ρ ; lower case rho
+:oC:s::σ ; lower case sigma
+:oC:t::τ ; lower case tau
+:oC:u::υ ; lower case upsilon
+:oC:w::ω ; lower case omega
+:oC:x::χ ; lower case chi
+:oC:y::ψ ; lower case psi
+:oC:z::ζ ; lower case zeta
+
+; ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ
+
+:oC:A::Α ; capital alpha
+:oC:B::Β ; capital beta
+:oC:C::Ξ ; capital xi
+:oC:D::Δ ; capital delta
+:oC:E::Ε ; capital epsilon
+:oC:F::Φ ; capital phi
+:oC:G::Γ ; capital gamma
+:oC:H::Ε ; capital eta
+:oC:I::Ι ; capital iota
+:oC:K::Κ ; capital kappa
+:oC:L::Λ ; capital lambda
+:oC:M::Μ ; capital mu
+:oC:N::Ν ; capital nu
+:oC:o::Ο ; capital omicron
+:oC:P::Π ; capital pi
+:oC:Q::Θ ; capital theta
+:oC:R::Ρ ; capital rho
+:oC:S::Σ ; capital sigma
+:oC:T::Τ ; capital tau
+:oC:U::Υ ; capital upsilon
+:oC:W::Ω ; capital omega
+:oC:X::Χ ; capital chi
+:oC:Y::Ψ ; capital psi
+:oC:Z::Ζ ; capital zeta
+
+;加入 5ms 延迟，对慢速的电脑来说，输入长字符串不会出现问题。
+:ok10:-::━━━━━━
+:ok10:par:: ∂ 
+:ok10:partial:: ∂ 
+:ok10:di::／; 1⁄1 2/2 3／3  注意三种除法的区别，第三种可读性最高。 
+:ok10:divider:: ／ 
+:ok10:fraction:: ⁄ 
+:ok10:fra::⁄
+:ok10:int:: ∫ 
+:ok10:integral:: ∫ 
+:ok10:inf:: ∞
+:ok10:infinity:: ∞
+:ok10:neq::  ≠ 
+:ok10:sqrt:: √ 
+:ok10:half:: ½ 
+:ok10:quater:: ¼ 
+:ok10:12:: ½  
+:ok10:14:: ¼  
+:ok10:nabla::𝛁          ;nabla 是 电磁场中常用的运算符。
+:ok10:del::𝛁    ;nabla 又叫 del
+:ok10:sum:: Σ ;大写 s 加 撇号也行。
+:ok10:vec:: ⃗  ;vector 向量箭头 可能显示不出来
+
+:ok10:email::c15601360539@gmail.com
+:ok10:youxiang::15601360539@163.com
+:ok10:mima::john_cenam
+
+:ok10:qq::1410046075
+:ok10:shouji::15601360539
+:ok10:dizhi::北京市石景山区古城路2栋80号   北京市石景山区古城路2栋5单元501
+:ok10:k4::kanriluo04
+:ok10:k6::w6789e7890
+:ok10:sfz::110107199801120333
+:ok10:jiji::基极
+:ok10:jidianji::集电极
+:ok10:bji:: 基极
+:ok10:cji:: 集电极
+:ok10:eji:: 发射极
+:ok10:gji:: 栅极
+:ok10:dji:: 漏极
+:ok10:sji:: 源极
+
+
+
+;⁰ ¹ ² ³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹ ⁺⁻⁼ ⁽ ⁾   上标 superscript
+Esc & 0::⁰
+Esc & 1::¹
+Esc & 2::²
+Esc & 3::³
+Esc & 4::⁴
+Esc & 5::⁵
+Esc & 6::⁶
+Esc & 7::⁷
+Esc & 8::⁸
+Esc & 9::⁹
+; 很难去按组合热键, 三个键的组合键doesn't work
+Esc & \::⁺
+Esc & f9::⁺
+Esc & f10::⁻
+Esc & f11::ᐧ
+Esc & f12::／
+F1 & f9::+
+F1 & f10::-
+F1 & f11::×
+F1 & f12::÷
+
+
+
+Esc & -::⁻
+Esc & =::⁼
+Esc & [::⁽
+Esc & ]::⁾
+Esc & f5::Send,f(x)
+Esc & f6::Send,f'(x)
+Esc & f7::Send,f''(x)
+Esc & f8::Send,f'(x)²
+
+
+;abcd=>>ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ 上标 superscript 
+Esc & a::ᵃ
+Esc & b::ᵇ
+Esc & c::ᶜ
+Esc & d::ᵈ
+Esc & e::ᵉ
+Esc & f::ᶠ	
+Esc & g::ᵍ
+Esc & h::ʰ
+Esc & i::ⁱ
+Esc & j::ʲ
+Esc & k::ᵏ
+Esc & l::ˡ
+Esc & m::ᵐ
+Esc & n::ⁿ
+Esc & o::ᵒ
+Esc & p::ᵖ
+Esc & r::ʳ
+Esc & s::ˢ
+Esc & t::ᵗ
+Esc & u::ᵘ
+Esc & v::ᵛ
+Esc & w::ʷ
+Esc & x::ˣ
+Esc & y::ʸ
+Esc & z::ᶻ
+;-------------₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉ ₊ ₋ ₌ ₍ ₎   下标 subscript
+F1 & 0::₀
+F1 & 1::₁
+F1 & 2::₂
+F1 & 3::₃
+F1 & 4::₄
+F1 & 5::₅
+F1 & 6::₆
+F1 & 7::₇
+F1 & 8::₈
+F1 & 9::₉
+; 很难去按组合热键, doesn't work
+F1 & Backspace::₊
+F1 & -::₋ 
+F1 & =::₌ 
+F1 & [::₍
+F1 & ]::₎ 
+
+;abcd=>>ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓ  下标 subscript
+F1 & a::ₐ
+F1 & e::ₑ
+F1 & h::ₕ
+F1 & i::ᵢ
+F1 & j::ⱼ
+F1 & k::ₖ
+F1 & l::ₗ
+F1 & m::ₘ
+F1 & n::ₙ
+F1 & o::ₒ
+F1 & p::ₚ
+F1 & q::ᵅ  ;α  
+F1 & r::ᵣ
+F1 & s::ₛ
+F1 & t::ₜ
+F1 & u::ᵤ
+F1 & v::ᵥ
+F1 & x::ₓ
+F1 & z::Send,ᴬ ᴮ ᴰ ᴱ ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ ᴿ ᵀ ᵁ ⱽ ᵂ ᵅ ᵝ ᵞ ᵟ ᵋ ᶿ ᶥ ᶲ ᵠ ᵡ ᵦ ᵧ ᵨ ᵩ ᵪ  ;三个组合键的代码不好写，请各位自己铺开快捷键。
+
+;→ ←↑↓    ┷ ┯⟾⟹⟺ ⟸
+Esc & Up::↑
+Esc & Down::↓
+Esc & Left::←
+Esc & Right::→
+F1 & Up::⟺
+F1 & Down::≝
+F1 & Left::⟸
+F1 & Right::⟾
+
+F2 & l::Send,ℒ    ; laplace transform
+F2 & f::Send,ℱ    ;  Fourier transform
+F2 & z::Send,𝒵    ;  Z transform 
+
+
+
+
+;√  ∞ Σ ∫  ⇑  ⇒  ⇓   ⇐ ↔⇔→⇒
+;≠≡≈≝≤≥   ∂
+;∞∘∫∫∂∮∯∇  ◠◡ 
+;__⭜ ‾‾⭝        ⮨⮪⮩⮫⮬⮭⮮⮯   some arraw donesn't show in text editor, but it's ok in web browser and notebook.
+;🠬 🠮 🠭 🠯  ⇐⇑⇒⇓⇔⇕⇖⇗⇘⇙ 
+;⯬⯭⯮⯯ ⬎⬏⬐⬑ ⟹ ⇑（指数最快的函数都可以用折线）
+;;⮠ ⮢ ⮡ ⮣ ⮥⮤ ⮧ ⮦ ◜◟◝◞
+;↑↓←→↖↙↘↗  → ←↑↓
+;⟵⟶⟷⟸⟹⟺⟻⟼⟽⟾┷┯┠ ┨  ╋ ━ ┃
+;  ╲╱╱╲
+;
+;∫　　　ｘ²　　　∫　　　ｘ²　　　　　∫　　ａ²　　　　　　　　　　　　　　　　
+;∫━━━━━━━━━━ ＝∫━━━━━━━━━━━ 　＋∫　━━━━━━━━━━━ 
+;∫　　　ｘ²　　　∫√（ｘ²＋ａ²）　　　∫　√（ｘ²＋ａ²）
+;
+
+Esc::Send,{Esc}�    ;  restore native function
+F2::Send,{F2}    ;
+F1::Send,{F1}    ;  
+
+
+Esc & f1::Function_Set_Language(0)
+Esc & f2::Function_Set_Language(1)
+;--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+; 我试了很多种 增强大写锁定切换语言的方法，其中第三种最好用：
+;	方法一：指定语言
+;	方法二：轮流切换 ctrl+shift 切换语言。
+;	方法三：√ 目前脚本使用的： 使用cap 瞬间短按是轮流切换、较短是英文、长按对应中文。同时，还支持指定切换： cap+R、F、B是中、英、大写指定切换。
+
+
+
+;其他功能：
+;代码中 IME = 0 是 英文，1 是中文。
+
+     
+
+
+
+
+
+
+
+CapsLock::
+KeyWait, CapsLock
+TimeLength := A_TimeSinceThisHotkey
+;MsgBox, The BackSpace key has been held down for %TimeLength%ms
+
+if( A_PriorKey = "Capslock" ){
+;我的 Cap键绑定了很多功能，例如还有 cap+w 这种组合键，不幸的是这种写法会有干扰，不加处理的话，会同时触发 cap+w 和 切换语言的功能。
+;所以需要判断有没有其他按键按下，如果没有，再切换语言。实现方法是这个系统变量 prior key，这个变量的名字是固定的，不用加%%来表示他是变量。
+
+
+
+	if (TimeLength < 200) {
+		Function_Set_Language(9)  ;翻转中英文。
+	}
+	else if (TimeLength < 400) {   ;(英文的按键时长要 大于 200 且 小于400ms,中文 <1000ms）
+
+		Function_Set_Language(0)  ; 1中文，0 英文
+		SoundBeep, 3000, 100  ;频率3000hz，时长100ms
+	}
+	else if (TimeLength < 1000) {
+		Function_Set_Language(1)   ; 1中文， 0 英文
+		SoundBeep, 1790, %TimeLength%  ;频率1790hz，时长是你按下去大写的时间。
+	}
+	else  {
+		ToolTip, Super Funcion On! `n You just wasted a second, 300, 450
+	}
+}
+else {
+	ToolTip, 您使用了其他组合键，将不触发切换语言功能。 , 100, 150
+}
+If (IME_GET()=1)
+	ToolTip, 输入法为中文状态   `n 您按住 CapsLock 键时长%TimeLength%ms 。`n  , 100, 150
+else
+	ToolTip, The IME is English   `n 您按住 CapsLock 键时长%TimeLength%ms 。`n  , 100, 150
+SetTimer, RemoveToolTip, -1000
+return
+
+
+CapsLock & r::Function_Set_Language(1)    ;切换并指定为中文
+CapsLock & f::Function_Set_Language(0)   ;切换并指定为英文
+CapsLock & B::SetCapsLockState, AlwaysOn   
+
+
+delete_one_line(){
+Send,{Home}{Shift down}{End}{Shift up}
+Sleep,1
+Send,{BackSpace}  ;删除一行，而不是删除所有文字，功能挺顺手的。
+return
+}
+CapsLock & ]::SetTimer, Right_func, 1500 
+CapsLock & [::SetTimer, Left_func, 1500 
+Right_func:
+Send,{Right}
+return
+Left_func:
+Send,{Left}
+return
+
+
+; 用系统的切换语言
+Func_alt_shift(){
+    Send, {Alt down}{Shift}{Alt up}
+    return 0
+}
+Func_ctrl_shift(){
+    Send, {Ctrl down}{Shift}{Ctrl up}
+    return 0
+}
+; 用 ime的切换语言,
+Func_ctrl_space(){
+Send, {Ctrl down}{Space}{Ctrl up}
+    return 0
+}
+
+
+Function_Set_Language(target_state) {
+	SetCapsLockState, AlwaysOff   
+	if ( target_state <> IME_GET()){  ; 只有想要切换的语言和当前语言不同的时候才切换。  
+;中文1 不等于英文0时，切换；也有妙用，例如数字0不等于 1 or 0， 就相当于“翻转当前状态”
+		Func_ctrl_shift()   ;切换到另一种语言。
+	}
+    Return 0
+}
+
+
+
+RemoveToolTip:
+ToolTip
+return
+
+
+CapsLock & T::
+; 变成上标，不推荐。最好使用直接是上下标的  unicode码。
+Send,{Shift down}{Left}{Shift up}
+Send,{Ctrl down}{Shift down}={Shift up}{Ctrl up} 
+Send,{Left}
+return
+CapsLock & G::
+; 变成下标，不推荐。最好使用直接是上下标的  unicode码。
+Send,{Shift down}{Left}{Shift up}
+Send,{Ctrl down}={Ctrl up} 
+Send,{Left}
+return
+
+;CapsLock & c::
+;using_shift_to_help_typing_in_Chinese:=using_shift_to_help_typing_in_Chinese=1?0:1   
+;ToolTip, 开关shift功能，用 shift 组合键帮忙打中文。`n 当前状态%using_shift_to_help_typing_in_Chinese%, 100, 150
+;SetTimer, RemoveToolTip, -5000
+;return
+
+
+
+
+;-------------------------------------------------------------------------------------------------------------
+;cap+3 4 5 wordpress增强功能。 cap+t, cap+g   数字上标、下标的功能。
+;cap+c 开关shift加强中文的功能。通过开关保持正常功能。
+;cap+v 开关移动鼠标，uiohjkl；nm等直接用于用于鼠标的移动。
+;最后一点忠告，千万不要修改tab的功能，很影响使用！
+
+CapsLock & a::Send,{Left}
+CapsLock & d::Send,{Right}
+
+;Send,{Down}
+
+CapsLock & i::MouseMove, 0, -20, 50, R
+CapsLock & j::MouseMove, -20, 0, 50, R
+CapsLock & k::MouseMove, 0, 20, 50, R
+CapsLock & l::MouseMove, 20, 0, 50, R
+
+;-------------------------------------------------------------------------------------------------------------
+;分号用作打字法加强，上下左右移动键，翻页加强、删除。
+;分号不是常用按键，需要一个特殊的编码"SC027"。分号键（sc027）用作修饰键，配合asdf等输入。
+
++SC027::Send,{:}   ;保护";"原来的功能
+*SC027::Send,{SC027}   ;保护";"原来的功能
+
+;;不要用 - = 翻页，中文打字法太笨了，会以为你输入了个“=”，而不是向后翻页。正确的方法是用“上下”
+;百度输入法支持“上下”翻页，显示效果也不错，所以配合百度输入法比较好用。
+SC027 & i::Send,{Up}     
+SC027 & j::Send, {Left}     
+SC027 & k::Send, {Down}     
+SC027 & l::Send,{Right}   
+
+SC027 & w::Send,{Shift down}{Up}{Shift up} 
+SC027 & a::Send,{Shift down}{Ctrl down}{Left}{Ctrl up}{Shift up} ;  
+SC027 & s::Send,{Shift down}{Down}{Shift up} 
+SC027 & d::Send,{Shift down}{Ctrl down}{Right}{Ctrl up}{Shift up}
+
+SC027 & e::Send,{Delete}  
+CapsLock & e::Send,{Delete}  
+SC027 & q::Send,{BackSpace}
+CapsLock & Q::Send,{BackSpace}
+SC027 & r::
+SC027 & p::
+delete_one_line()   ;自定义的函数
+return
+
+SC027 & m::
+replace_enter_to_soft_enter()   ;
+return
+
+
+
+SC027 & f::Send, {Enter} 
+SC027 & t::Send, {Enter} 
+
+SC027 & h::Send, {PgUp}     
+SC027 & n::Send,{PgDn}   
+SC027 & u::Send, {Home}     
+SC027 & o::Send,{End}
+
+
+replace_enter_to_soft_enter(){        ;这个有点问题，字符串替换不行，函数不能用。
+SoundBeep, 3000, 100  ;频率3000hz，时长100ms
+Send {Ctrl Down}c{Ctrl Up}
+Clipboard := StrReplace(Clipboard, "`r`n", "xxxxx")
+Send {Ctrl Down}v{Ctrl Up}
+return
+}
+;---------------------------------------------------------------------------------
+;撇号  '   ，分号右边的那个按键，的重映射，这里的功能删除了（功能太多太难记住了）
+
+
+
+;-------------------------------------------------------------------------------------------------------------
+CapsLock & 3::Send,{Home}{Space 4}{Down}  ;添加四个空格，缩进
+CapsLock & 4::           ;wordpress 文字修改，这个是添加软回车，wordpress  需要一整块的文字，
+Send,{End}
+Sleep, 50
+Send,{delete}
+Sleep, 50
+Send,{Shift down}{Enter}{Shift up}{End}
+return
+
+CapsLock & 5::          ;配合使用软回车、换行
+Send,{Down}{End}
+return
+
+
+
+
+
+
+
+IME_GET(WinTitle="")
+;-----------------------------------------------------------
+; IMEの状態の取得      ，获得输入法（Input Method）的中英文状态。 1是输入法打开（日文 or 中文），0 是英文
+;    対象： AHK v1.0.34以降
+;   WinTitle : 対象Window (省略時:アクティブウィンドウ)
+;   戻り値  1:ON 0:OFF
+;-----------------------------------------------------------
+{
+    ifEqual WinTitle,,  SetEnv,WinTitle,A
+    WinGet,hWnd,ID,%WinTitle%
+    DefaultIMEWnd := DllCall("imm32\ImmGetDefaultIMEWnd", Uint,hWnd, Uint)
+    ;Message : WM_IME_CONTROL  wParam:IMC_GETOPENSTATUS
+    DetectSave := A_DetectHiddenWindows
+    DetectHiddenWindows,ON
+    SendMessage 0x283, 0x005,0,,ahk_id %DefaultIMEWnd%
+    DetectHiddenWindows,%DetectSave%
+    Return ErrorLevel
+}
