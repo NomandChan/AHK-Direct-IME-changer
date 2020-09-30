@@ -28,7 +28,7 @@ hotstring 是最快捷、最方便的输入方式。hotstring 让你用说话的
 
     f(ε)= ∫ᵇₐ f(x)dx ／|b-a|
 
-    ∫ᵇₐ f(x)g(x)dx = f(ε) ∫ᵇₐ g(x)dx
+    ∫ᵇₐ f(x)g(x)dx = f(ε) ∫ᵇₐ g(x)dx , ε∈(a,b)
 
     f'(x)／1+f(x)² ← d arctan f(x)
 
@@ -43,3 +43,6 @@ hotstring 是最快捷、最方便的输入方式。hotstring 让你用说话的
 还有很多很多符号，更详细的说明请见我的网站：https://nomand-chan.xyz/autohotkey%e8%84%9a%e6%9c%ac/
 将 CapsLock 变废为宝，把长按\短按大写锁定变成切换语言的功能，是中文用户必不可少的自定义；将希腊字母，上下标映射到组合键和快捷键上，而且当用户掌握以后，可以自行添加符号“ ℱℒ𝒵” 等。 再加上组合键、快捷方式，使键盘顺手不少。这个脚本是我自己每天都使用的，希望这篇文章帮助大家打开新世界。
 
+考虑到网络因素，附加上 AutoHotkey_1.1.33.02_setup 的安装方式：
+链接：https://pan.baidu.com/s/1JSarNM9XYON0rMu5y4XEvQ 
+提取码：h2l7 
