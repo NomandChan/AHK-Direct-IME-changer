@@ -97,7 +97,8 @@ global StartTime:= 0
 :ok10:fraction:: ⁄ 
 :ok10:fra::⁄
 :ok10:int:: ∫ 
-:ok10:integral:: ∫ 
+:ok10:integral:: ∫∬∭⨌∱⨑∲∳  ∮∯∰
+:ok10:sets::϶∀∁∃∄∅∈∉∵∴ 
 :ok10:inf:: ∞
 :ok10:infinity:: ∞
 :ok10:neq::  ≠ 
