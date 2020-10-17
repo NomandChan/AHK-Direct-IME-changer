@@ -2,7 +2,7 @@
 Quick switch between English keyboard and Chinese/Japanese/Korean IME. For non-english users, it's a pain to type formula and text, juggling between them is already annoying for bilinguals. So I made this script to make life easier by using rarely used Capslock to switch language ( easy replace for Ctrl + Shift) and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. 
 
 
-To type "α", just a + \` , Σ for S\`, dontclick@gmail.com for email\`,  ½ for half\`. The apostrophe end character was space or enter by default AHK setting, but I changed it to Tab and \` (either of them), cuz it's already used by Chinese IME.  ³⁴⁵⁶ʳᵗʸ superscript by pressing Esc +3456, underscript for F1 +123 →→₁₂₃ ,lots things.<br><br>
+To type "α", just a + \` , Σ for S\`, dontclick@gmail.com for email\`,  ½ ← half\`, ∫ ← integral\`.  And Combo keys:  ³⁴⁵⁶ʳᵗʸ superscript by pressing Esc +3456rty, underscript for F1 +123 →→₁₂₃ , and others ....<br><br>
 
 &emsp;大小写键用来切换输入法，光这一点就值得你所有中国人用😃😃，脚本内还有了很多数学、短语、希腊字符的快速输入方法，用上就是赚到。<br>
 
@@ -27,7 +27,7 @@ Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
 <br>
 
 &emsp;输入希腊字符的方式是，hotstring+结束符，结束符是 tab 或 撇号。原因是俩个键比较好按，并且避开了空格。 hotstring 最方便了，让你用说话的同时输入特殊符号，相当于一个自己写的输入法，并且没有给自己添加记忆的负担。<br>
-&emsp;默认情况下 AHK是空格、句号、回车，也就是打一个短语按一下空格，它自动替换你的句子。但是这个最方便的组合已经被咱们中国人用了，所以修改了以下结束符。这个结束符也可以自己设置，修改方法： 去脚本里找到这个词条，留下你想要的 #Hotstring EndChars -()[]{}:;'"/\,.?!`n `t  。<br>
+&emsp; The apostrophe end character was space or enter by default AHK setting, but I changed it to Tab and \` (either of them), cuz it's already used by Chinese IME. 默认情况下 AHK是空格、句号、回车，也就是打一个短语按一下空格，它自动替换你的句子。但是这个最方便的组合已经被咱们中国人用了，所以修改了以下结束符。这个结束符也可以自己设置，修改方法： 去脚本里找到这个词条，留下你想要的 #Hotstring EndChars -()[]{}:;'"/\,.?!`n `t  。<br>
 &emsp;还有一些组合键，（例如人们最熟悉的组合键是 ctrl + c\v），AHK 支持任意两个键形成组合键。这里我主要使用 ESC、F1作为修饰键，ESC + t →ᵗ，两个键对应上标下标，非常好用。输入这些让人头疼的数学符号，在 AHK 的帮助下方便多了。 unicode 也可以完成很多数学公式的展示，这种方式不需要复杂的插件支持，人人都可以复制粘贴，非常方便~~~ 里面有很多数学字符，我放进去了很多，热键、组合键，展示一下 Unicode 输入公式是什么样的：
 <br><br>
 
