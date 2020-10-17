@@ -19,7 +19,7 @@ Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
 
 <br><br>
 
-                   说一个字母，加一个撇，就成了希腊字母，说一个单词/拼音，加一个撇，变成了自己的常用短语，例如 
+                   字母，加撇\` →→ 希腊字母 ;单词加撇 →→ 常用短语，例如 
                        email+结束符\`得到自定义短语： cmyistu@gmail.com。 
                         字母+结束符\`得到希腊字母：   a+\`→ α    S+\` →Σ    x+ \` → χ    half+ \` →  ½   quater + Tab → ¼
                    组合键用来输入上下标，例如       Esd + 123 → ¹²³    F1+123 → ₁₂₃  Esc + e →ᵉ   
