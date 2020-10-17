@@ -1,10 +1,18 @@
 # AHK-快速切换输入环境、输入特殊字符
-
-&emsp;脚本基本功能：  <br>
-* Caps 用来切换中文英文。 <br>
-* hotstring 快捷键：字母+撇号得到希腊字母和数字上下标，例如：a+\` → α，c + \` →ξ  ，C+\`→Ξ   <br>
-* 组合键： 数字上标：ESC +1234  →   ¹²³⁴ ；数字下标F1 + 1234-=[]  →    ₁₂₃₄₋₌₍₎  <br>
+Quick switch between English keyboard and Chinese/Japanese/Korean IME. For non-english users, it's a pain to type formula and text. So I made this script to customize by using rarely used Capslock to switch language ( easy replace for Ctrl + Shift) and making math symbols hotstring and quick replacement. <br><br>
+To type "α", just a\` , Σ for S\`, xxx@gmail.com ← email\`, the AHK built in function are easy to use. The apostrophe end character was space or enter by default AHK setting, but I changed it to Tab and \` (either of them), cuz it's already used by Chinese IME. <br><br>
 &emsp;大小写键用来切换输入法，光这一点就值得你所有中国人用😊😃，我还融合了很多数学、短语、希腊字符的快速输入方法，用上就是赚到。<br>
+
+## AHK setting up
+Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
+安装 AHK （文末） → 新建 txt，复制脚本进去 → 改文件名后缀为 .ahk → 运行
+
+## How to use this 脚本基本功能
+* CapsLock to swtich language 用来切换中文英文。 <br>
+* hotstring :( something and a end character )快捷键：字母(letter of string)+ \`撇号得到希腊字母和数字上下标，例如：a+\` → α，c + \` →ξ  ，C+\`→Ξ   <br>
+* Combo keys :组合键 ： ESC +1234  → 数字上标：  ¹²³⁴ ；数字下标F1 + 1234-=[]  →    ₁₂₃₄₋₌₍₎  <br>
+* And lots of functions/keys to discover. 
+
 <br><br>
 
                    说一个字母，加一个撇，就成了希腊字母，说一个单词/拼音，加一个撇，变成了自己的常用短语，例如 
@@ -37,7 +45,7 @@
 <br><br><br><br><br>
 &emsp;还有很多很多符号，更详细的说明请见我的网站：https://nomand-chan.xyz/autohotkey%e8%84%9a%e6%9c%ac/
 &emsp;具体实现很细节，大写锁定复用了很多次：1）短按重映射大写锁定为 ctrl+shift，用来切换语言；较长按下去 caps (200-400 ms) ，用来指定切换到英文（而不是轮流切换），长按 caps  (400-1000 ms) 是切换到中文。caps + B 指定切换到英文大写 CAPITAL . <br>
-&emsp;将 CapsLock 变废为宝，把长按\短按大写锁定变成切换语言的功能，是中文用户必不可少的自定义；将希腊字母，上下标映射到组合键和快捷键上，而且当用户掌握以后，可以自行添加符号“ ℱℒ𝒵” 等。 再加上组合键、快捷方式，使键盘顺手不少。这个脚本是我自己每天都使用的，希望这篇文章帮助大家打开新世界。<br>
+&emsp;将 CapsLock 变废为宝，把长按\短按大写锁定变成切换语言的功能，是中文用户必不可少的自定义；将希腊字母，上下标映射到组合键和快捷键上，而且当用户掌握以后，可以自行添加符号“ ℱℒ𝒵” 等。 再加上组合键、快捷方式，使键盘顺手不少，（甚至用于账号密码保存）。这个脚本是我自己每天都使用的，希望这篇文章帮助大家打开新世界。<br>
 
 &emsp;考虑到网络因素，附加上 AutoHotkey_1.1.33.02_setup 的安装方式：<br>
 链接：https://pan.baidu.com/s/1JSarNM9XYON0rMu5y4XEvQ  <br>
