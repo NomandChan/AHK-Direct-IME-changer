@@ -2,10 +2,11 @@
 Quick switch between English keyboard and Chinese/Japanese/Korean IME. For non-english users, it's a pain to type formula and text, juggling between them is already annoying for bilinguals. So I made this script to make life easier by using rarely used Capslock to switch language ( easy replace for Ctrl + Shift) and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. 
 
 
-To type "α", just a\` , Σ for S\`, dontclick@gmail.com for email\`, the AHK built in function are easy to use. The apostrophe end character was space or enter by default AHK setting, but I changed it to Tab and \` (either of them), cuz it's already used by Chinese IME. <br><br>
+To type "α", just a + \` , Σ for S\`, dontclick@gmail.com for email\`,  ½ for half\`. The apostrophe end character was space or enter by default AHK setting, but I changed it to Tab and \` (either of them), cuz it's already used by Chinese IME.  ³⁴⁵⁶ʳᵗʸ superscript by pressing Esc +3456, underscript for F1 +123 →→₁₂₃ ,lots things.<br><br>
+
 &emsp;大小写键用来切换输入法，光这一点就值得你所有中国人用😃😃，脚本内还有了很多数学、短语、希腊字符的快速输入方法，用上就是赚到。<br>
 
-<br>You just found a treasure. AHK can automatize everything, using it to edit HTML webpages, store codelet, quick typing phone numbers and address, and control windows programs and mouse.(which is too complicated to be included in here) <br>
+<br>You just found a treasure. AHK can automatize everything, using it to edit HTML webpages, store codelet, quick typing phone numbers and address, and control windows programs and mouse.(which is too complicated to be included in here).the AHK built in function are easy/good to use. <br>
 ## AHK setting up
 Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
 安装 AHK （文末） → 新建 txt，复制脚本进去 → 改文件名后缀为 .ahk → 运行
