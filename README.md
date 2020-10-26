@@ -1,6 +1,6 @@
 # AHK-Swtich Input Method & Type Greek symbols
-快速切换输入环境、输入特殊字符
-Quick switch between English keyboard and Chinese/Japanese/Korean IME. For non-english users, it's a pain to type formula and text, juggling between them is already annoying for bilinguals. So I made this script to make life easier by using rarely used Capslock to switch language ( easy replace for Ctrl + Shift) and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. 
+快速切换输入环境、输入特殊字符 Quick switch between English keyboard and Chinese/Japanese/Korean IME. 
+For non-english users, it's a pain to type formula and text, juggling between them is already annoying for bilinguals. So I made this script to make life easier by using rarely used Capslock to switch language ( easy replace for Ctrl + Shift) and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. 
 
 
 To type "α", just a + \` , Σ for S\`, dontclick@gmail.com for email\`,  ½ ← half\`, ∫ ← integral\`.  And Combo keys:  ³⁴⁵⁶ʳᵗʸ superscript by pressing Esc +3456rty, underscript for F1 +123 →→₁₂₃ , and others ....<br><br>
