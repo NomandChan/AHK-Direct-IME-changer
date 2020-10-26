@@ -1,4 +1,5 @@
-# AHK-Swtich Input Method & Type Greek symbols快速切换输入环境、输入特殊字符
+# AHK-Swtich Input Method & Type Greek symbols
+快速切换输入环境、输入特殊字符
 Quick switch between English keyboard and Chinese/Japanese/Korean IME. For non-english users, it's a pain to type formula and text, juggling between them is already annoying for bilinguals. So I made this script to make life easier by using rarely used Capslock to switch language ( easy replace for Ctrl + Shift) and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. 
 
 
@@ -54,4 +55,8 @@ Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
 &emsp;考虑到网络因素，附加上 AutoHotkey_1.1.33.02_setup 的安装方式：<br>
 链接：https://pan.baidu.com/s/1JSarNM9XYON0rMu5y4XEvQ  <br>
 提取码：h2l7  <br>
- 
+
+## 
+Full-width characters 全角切换：astutecat/autofullwidth
+Mouse Gesture Using AHK : Pyonkichi's Mouse Gesture
+Mouse Gesture Using C# APP: WGestures 鼠标手势，免费软件，颜值很高、功能很棒。
