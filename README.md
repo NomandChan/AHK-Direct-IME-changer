@@ -57,6 +57,6 @@ Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
 提取码：h2l7  <br>
 
 ## 
-Full-width characters 全角切换：astutecat/autofullwidth
-Mouse Gesture Using AHK : Pyonkichi's Mouse Gesture
-Mouse Gesture Using C# APP: WGestures 鼠标手势，免费软件，颜值很高、功能很棒。
+Full-width characters 全角切换：astutecat/autofullwidth<br>
+Mouse Gesture Using AHK : Pyonkichi's Mouse Gesture<br>
+Mouse Gesture Using C# APP: WGestures 鼠标手势，免费软件，颜值很高、功能很棒。<br>
