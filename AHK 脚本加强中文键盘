@@ -1,3 +1,4 @@
+; Quick typing and text editing!    ; use like any other AHK script.
 ;这个脚本控制着语言切换和快速输入数学符号，两个功能。 使用方法：可以直接新建 txt，然后更名为 xxx.ahk，复制全部代码，运行即可使用。说明见 readme
 
 
@@ -8,11 +9,17 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetCapsLockState, AlwaysOff  
-; 没啥用，这里可以删。用几个变量为脚本增加一些功能，但是这些功能都太复杂，例如点 3 次某个键， 点 4 次某个键，触发什么什么功能，最后我都删了，因为自己都记不住。
+
+
+global Current_IME_State:= 1    ;✨1 is  Eng, 2 is Chinese,  (IMEs are too complicated and way too bloated to extract the key info we need, so we better track the states by ourself. )✨
+global Current_IME_Is_half_width:= 0  ;✨ "1" is full-width input mode, "0" is normal. ✨
 global using_keyboard_controlling_mouse:=0                                                                                                                                                                                                            
 global using_shift_to_help_typing_in_Chinese:=1 
-global Caps_Times:= 0        
+global n_mouse_move_momentum:=0  
+global Caps_Times:= 0        ; 没啥用，这里可以删。用几个变量为脚本增加一些功能，但是这些功能都太复杂，例如点 3 次某个键， 点 4 次某个键，触发什么什么功能，需要变量来记录。但最后我都删了，因为自己都记不住。
 global StartTime:= 0
+
+
 ;-------------------------------------------------------------------------------------------------------------
 
 
@@ -88,40 +95,41 @@ global StartTime:= 0
 :oC:Y::Ψ ; capital psi
 :oC:Z::Ζ ; capital zeta
 
-;加入 5ms 延迟，对慢速的电脑来说，输入长字符串不会出现问题。
+;加入 10ms 延迟，对慢速的电脑来说，输入长字符串不会出现问题。
 :ok10:-::━━━━━━
 :ok10:par:: ∂ 
 :ok10:partial:: ∂ 
-:ok10:di::／; 1⁄1 2/2 3／3  注意三种除法的区别，第三种可读性最高。 
 :ok10:divider:: ／ 
-:ok10:fraction:: ⁄ 
+:ok10:fraction:: ⁄   ; 1⁄1 2/2 3／3  注意三种除法的区别，第三种可读性最高。
 :ok10:fra::⁄
 :ok10:int:: ∫ 
 :ok10:integral:: ∫∬∭⨌∱⨑∲∳  ∮∯∰
-:ok10:sets::϶∀∁∃∄∅∈∉∵∴ 
+:ok10:sets::϶∀∁∃∄∅∈∉∵∴ ⎲⎳⌠⌡
 :ok10:inf:: ∞
 :ok10:infinity:: ∞
 :ok10:neq::  ≠ 
 :ok10:sqrt:: √ 
 :ok10:half:: ½ 
 :ok10:quater:: ¼ 
+:ok10:plusminus:: ±
+:ok10:plmi:: ±
 :ok10:12:: ½  
 :ok10:14:: ¼  
+:ok10:variesas::∝
 :ok10:nabla::𝛁          ;nabla 是 电磁场中常用的运算符。
 :ok10:del::𝛁    ;nabla 又叫 del
 :ok10:sum:: Σ ;大写 s 加 撇号也行。
 :ok10:vec:: ⃗  ;vector 向量箭头 可能显示不出来
 
-:ok10:email::c15601360539@gmail.com
-:ok10:youxiang::15601360539@163.com
+:ok10:email::info@ksrgroupllc.com
 :ok10:mima::john_cena
 
-:ok10:qq::14xxxxxxxxxxxxxxxx
-:ok10:shouji::15xxxxxx60539
-:ok10:dizhi::北京市石景山区xxxx路xx栋xx0号   北京市石景山区古城路xxxx栋xx单元xxxx
-:ok10:k4::xxxxxkanxxxxxxx
-:ok10:k6::w67xxxxxxxxxxxx
-:ok10:sfz::1xxxxxxxxxxxxx0333
+:ok10:qq::1410046075
+:ok10:shouji::888-646-5693
+:ok10:dizhi::Cardi B c/o KSR Group, LLC 244 Fifth Ave Suite K261 New York, 
+:ok10:k4::circa-2006
+:ok10:k6::Imma let you know
+:ok10:sfz::info@ksrgroupllc.com
 :ok10:jiji::基极
 :ok10:jidianji::集电极
 :ok10:bji:: 基极
@@ -150,21 +158,17 @@ Esc & f9::⁺
 Esc & f10::⁻
 Esc & f11::ᐧ
 Esc & f12::／
+Esc & ,::≤            ;less than
+Esc & .::≥            ;greater than
 F1 & f9::+
 F1 & f10::-
 F1 & f11::×
 F1 & f12::÷
 
-
-
 Esc & -::⁻
 Esc & =::⁼
 Esc & [::⁽
 Esc & ]::⁾
-Esc & f5::Send,f(x)
-Esc & f6::Send,f'(x)
-Esc & f7::Send,f''(x)
-Esc & f8::Send,f'(x)²
 
 
 ;abcd=>>ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ 上标 superscript 
@@ -205,7 +209,7 @@ F1 & 7::₇
 F1 & 8::₈
 F1 & 9::₉
 ; 很难去按组合热键, 三个键的组合键，f1+ shift +  = 不等于 f1+ "+",  doesn't work
-F1 & Backspace::₊
+F1 & \::₊
 F1 & -::₋ 
 F1 & =::₌ 
 F1 & [::₍
@@ -232,6 +236,8 @@ F1 & v::ᵥ
 F1 & x::ₓ
 F1 & z::Send,ᴬ ᴮ ᴰ ᴱ ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ ᴿ ᵀ ᵁ ⱽ ᵂ ᵅ ᵝ ᵞ ᵟ ᵋ ᶿ ᶥ ᶲ ᵠ ᵡ ᵦ ᵧ ᵨ ᵩ ᵪ  ;三个组合键的代码不好写，请各位自己铺开快捷键。
 
+
+ 
 ;→ ←↑↓    ┷ ┯⟾⟹⟺ ⟸
 Esc & Up::↑
 Esc & Down::↓
@@ -241,10 +247,64 @@ F1 & Up::⟺
 F1 & Down::≝
 F1 & Left::⟸
 F1 & Right::⟾
-
+F1 & /::⁄
+Esc & /::⁄
 F2 & l::Send,ℒ    ; laplace transform
 F2 & f::Send,ℱ    ;  Fourier transform
 F2 & z::Send,𝒵    ;  Z transform 
+F2 & x::Send,X̅    ;  capital X bar
+
+
+
+F3 & a::Send,Ā
+F3 & b::Send,B̅
+F3 & c::Send,C̅
+F3 & d::Send,D̅
+F3 & x::Send,x̅X̅    ;  x bar 
+F3 & y::Send,y̅Ȳ  ;  y bar
+F3 & u::Send,∪  ;union
+F3 & i::Send,∩   ;intersection
+:ok10:bars::A̅ B̅ C̅ D̅ a̅ b̅ c̅ d̅ α̅ β̅ γ̅ δ̅ ε̅  x̅  X̅ y̅ ĀāḆḇḎḏĒēḠḡH̱ẖĪīḴḵḺḻṈŌōṞṟṮṯŪūX̱x̱ȲȳẔẕ
+
+
+
+
+
+Insert & Space::
+Esc & Space::Send,{⠀}    ;insert blank that you can't see, but still can be underlined.
+:ok10:fx::f(x)
+:ok10:Fx::F(x)
+:ok10:fx'::f'(x)
+:ok10:fx''::f⁽²⁾(x)
+:ok10:fx2::f(x)²
+:ok10:shuyu:: x ∈ (0,∞)   ;belong 属于
+:ok10:nb::🐮🍺
+
+
+
+;最后一点忠告，千万不要修改tab的功能，很影响使用！
+
+
+Insert & s::    ;求和 双行 Summation double line formula prefab
+Send, ⎲ ∞         xⁿ⁺² +{Enter}⎳n=0     n ᐧ (n{+}2)
+Sleep,600
+Send,{Up}
+Sleep,100
+Send,{Space 12}{⠀}
+Sleep,100
+Send,{Home}{Right 8}{Shift down}{End}{Shift up}
+Sleep,500
+Send ^u
+return
+
+Insert & i::Send, ⌠x        f(u)     du =+{Enter}⌡0    x ᐧ (x{+}2)    ;积分 integral formula prefab
+Insert & 1::    ;下划线 underline formula prefab
+Send,{Space 6}{1}{Space 6}{⠀}   ;insert blanks  . finally I can underline in Onenote, thank god.
+Sleep,100
+Send,{Home}{Right 8}{Shift down}{End}{Shift up}
+Sleep,500
+Send ^u
+return
 
 
 
@@ -254,23 +314,22 @@ F2 & z::Send,𝒵    ;  Z transform
 ;∞∘∫∫∂∮∯∇  ◠◡ 
 ;__⭜ ‾‾⭝        ⮨⮪⮩⮫⮬⮭⮮⮯   some arraw donesn't show in text editor, but it's ok in web browser and notebook.
 ;🠬 🠮 🠭 🠯  ⇐⇑⇒⇓⇔⇕⇖⇗⇘⇙ 
-;⯬⯭⯮⯯ ⬎⬏⬐⬑ ⟹ ⇑（指数最快的函数都可以用折线）
+;⯬⯭⯮⯯ ⬎⬏⬐⬑ ⟹ ⇑
 ;;⮠ ⮢ ⮡ ⮣ ⮥⮤ ⮧ ⮦ ◜◟◝◞
 ;↑↓←→↖↙↘↗  → ←↑↓
 ;⟵⟶⟷⟸⟹⟺⟻⟼⟽⟾┷┯┠ ┨  ╋ ━ ┃
 ;  ╲╱╱╲
-;
+;​ ←←here is zero-width space, is it cool? it's there but you can't seem it. 
 ;∫　　　ｘ²　　　∫　　　ｘ²　　　　　∫　　ａ²　　　　　　　　　　　　　　　　
 ;∫━━━━━━━━━━ ＝∫━━━━━━━━━━━ 　＋∫　━━━━━━━━━━━ 
 ;∫　　　ｘ²　　　∫√（ｘ²＋ａ²）　　　∫　√（ｘ²＋ａ²）
-;
-Esc::Send,{Esc} ;  restore native function
+;:sets::϶∀∁∃∄∅∈∉∵∴ ⎲⎳⌠⌡
+
+Esc::Send,{Esc} ;  keep basic functions
 F2::Send,{F2}    ;
 F1::Send,{F1}    ;  
 
 
-Esc & f1::Function_Set_Language(0)
-Esc & f2::Function_Set_Language(1)
 ;--------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -286,63 +345,192 @@ Esc & f2::Function_Set_Language(1)
 
      
 
-
-
-
-
-
-
 CapsLock::
 KeyWait, CapsLock
 TimeLength := A_TimeSinceThisHotkey
 ;MsgBox, The BackSpace key has been held down for %TimeLength%ms
 
-if( A_PriorKey = "Capslock" ){
-;我的 Cap键绑定了很多功能，例如还有 cap+w 这种组合键，不幸的是这种写法会有干扰，不加处理的话，会同时触发 cap+w 和 切换语言的功能。
-;所以需要判断有没有其他按键按下，如果没有，再切换语言。实现方法是这个系统变量 prior key，这个变量的名字是固定的，不用加%%来表示他是变量。
-
-
-
+if( A_PriorKey = "Capslock" ){ ;我的 Cap键绑定了很多功能，例如还有 cap+w 这种组合键，不幸的是这种写法会有干扰，不加处理的话，会同时触发 cap+w 和 切换语言的功能。所以需要判断有没有其他按键按下，如果没有，再切换语言。实现方法是这个系统变量 prior key，这个变量的名字是固定的，不用加%%来表示他是变量。
 	if (TimeLength < 200) {
 		Function_Set_Language(9)  ;翻转中英文。
 	}
 	else if (TimeLength < 400) {   ;(英文的按键时长要 大于 200 且 小于400ms,中文 <1000ms）
-
-		Function_Set_Language(0)  ; 1中文，0 英文
+		Function_Set_Language(1)  ; 2中文，1 英文 ;para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
 		SoundBeep, 3000, 100  ;频率3000hz，时长100ms
 	}
 	else if (TimeLength < 1000) {
-		Function_Set_Language(1)   ; 1中文， 0 英文
+		Function_Set_Language(2)   ; 2中文， 1 英文
 		SoundBeep, 1790, %TimeLength%  ;频率1790hz，时长是你按下去大写的时间。
 	}
 	else  {
-		ToolTip, Super Funcion On! `n You just wasted a second, 300, 450
+		Send,{LButton}
 	}
 }
 else {
 	ToolTip, 您使用了其他组合键，将不触发切换语言功能。 , 100, 150
 }
-If (IME_GET()=1)
-	ToolTip, 输入法为中文状态   `n 您按住 CapsLock 键时长%TimeLength%ms 。`n  , 100, 150
-else
-	ToolTip, The IME is English   `n 您按住 CapsLock 键时长%TimeLength%ms 。`n  , 100, 150
+
+if(Current_IME_State==1){
+	ToolTip, The IME is English `n You have been holding CapsLock %TimeLength%ms 。`n  , 1500, 500    ; I doesn't know why it suddenly wouln't work.
+}
+else{
+	ToolTip, 输入法为中文状态   `n 您按住大写锁定键时长%TimeLength% 毫秒 。`n  , 1600, 550 ; I doesn't know why it suddenly wouln't work.
+}
 SetTimer, RemoveToolTip, -1000
 return
 
-
-CapsLock & r::Function_Set_Language(1)    ;切换并指定为中文
-CapsLock & f::Function_Set_Language(0)   ;切换并指定为英文
 CapsLock & B::SetCapsLockState, AlwaysOn   
+CapsLock & n::SetCapsLockState, On   
+CapsLock & m::SetCapsLockState, Off
+
+   
+CapsLock & [::Function_Set_Language(2)    ;切换并指定为中文 para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
+CapsLock & ]::Function_Set_Language(1)   ;切换并指定为英文
+CapsLock & p::Func_toggle_Full_half_width(9)               ;全半角切换
 
 
-delete_one_line(){
-Send,{Home}{Shift down}{End}{Shift up}
-Sleep,1
-Send,{BackSpace}  ;删除一行，而不是删除所有文字，功能挺顺手的。
+
+
+;wordpress增强功能。 
+CapsLock & -::   ;上标 superscript
+CapsLock & T::       
+SC027 & T::  
+Send,{Shift down}{Left}{Shift up}
+Send,{Ctrl down}{Shift down}={Shift up}{Ctrl up} 
+Send,{Left}
+return
+; esc 在我的脚本里是上标的意思，F1 对应下标很好记。更简单的选择是，直接使用上下标的 unicode码。¹²³₁₂₃
+CapsLock & =::   ;下标 subscript
+CapsLock & G::       
+SC027 & G::  
+CapsLock & F1::
+Send,{Shift down}{Left}{Shift up}
+Send,{Ctrl down}={Ctrl up} 
+Send,{Left}
+return
+
+SC027 & Enter::  
+CapsLock & Enter::Send,+{Enter}  
+
+
+
+
+;-------------------------------------------------------------------------------------------------------------
+; Mouse move and click
+CapsLock & Up::function_my_mouse_momentum(0,-1)
+CapsLock & Left::function_my_mouse_momentum(-1,0)
+CapsLock & Down::function_my_mouse_momentum(0,1)
+CapsLock & right::function_my_mouse_momentum(1,0)
+CapsLock & Ctrl::Send,{LButton}
+CapsLock & Numpad0::Send,{RButton}
+
+function_my_mouse_momentum(x,y){  ;↑ y<0 ← x<0 ↓ y>0 → x>0
+if(A_TimeSincePriorHotKey<150){
+n_mouse_move_momentum += 15
+}
+else{
+n_mouse_move_momentum=32
+}
+MouseMove, x*n_mouse_move_momentum, y*n_mouse_move_momentum, 100, R
+
+;GetKeyState, state, Capslock
+;vari_a:=GetKeyState("Up")
+;ToolTip, %vari_a% , 100, 150
+;if (state = "D")
+;    ToolTip, %state% , 100, 150
+
+}
+;-------------------------------------------------------------------------------------------------------------
+;分号用作打字法加强，上下左右移动键，翻页加强、删除。
+;分号 semicolon 不是常用按键，需要一个特殊的编码"SC027"。
++SC027::Send,{:}   ;保护";"原来的功能
+*SC027::Send,{SC027}   ;保护";"原来的功能
+
+;-------------------------------------------------------------------------------------------------------------
+;moving Insertion point functions; 
+;move I-beam horizontally and vertically with "←↓↑→ hjkl".
+;move I-beam and selecting 
+; VIM use following setting, the whole set is too complicated, I just use the "←↓↑→ hjkl"
+;h – Moves the cursor left. j – Moves the cursor down. k – Moves the cursor up. l – Moves the cursor right. CapsLock & 2::
+; by the way VIM is too hard to learn and has practical situation to use. VIM 太难学了/用不上。
+
+
+CapsLock & j::
+SC027 & j::Send,{Left}
+CapsLock & k::
+SC027 & k::Send,{Down}
+CapsLock & i::
+SC027 & i::Send,{Up}
+CapsLock & l::
+SC027 & l::Send,{Right}
+
+
+;multiple key mapped to one function for clumpsy hands and easier to memory .
+
+
+; srat of line / end of line
+CapsLock & z::  
+SC027 & z::Send,{Home}
+CapsLock & c::  
+SC027 & c::Send,{End}
+
+
+CapsLock & w::   
+SC027 & w::Send,{Up}
+CapsLock & a::    ;previous word
+SC027 & a::Send,{Ctrl down}{Left}{Ctrl up}
+CapsLock & s::   
+SC027 & s::Send,{Down}
+CapsLock & d::  
+SC027 & d::Send,{Ctrl down}{Right}{Ctrl up}
+
+
+CapsLock & q::
+SC027 & q::Send,^{backspace} ;delete a word
+CapsLock & e::
+SC027 & e::Send,^{delete} ;delete a word after I-beam.
+
+
+CapsLock & r::
+SC027 & r::Send,^{z} ;redo
+
+;1→delete, `→backward delete 
+CapsLock & u::
+SC027 & u::Send,{BackSpace} 
+CapsLock & o::
+SC027 & o::Send,{Delete}  
+
+
+
+
+;------------------- select texts--------------
+; a little enhance ( basiclly not useful)
+SC027 & Left::Send,{Shift down}{Ctrl down}{Left}{Ctrl up}{Shift up} ;  
+SC027 & Down::Send,{Shift down}{Down}{Shift up} 
+SC027 & Up::Send,{Shift down}{Up}{Shift up} 
+SC027 & Right::Send,{Shift down}{Ctrl down}{Right}{Ctrl up}{Shift up}
+CapsLock & Backspace::
+SC027 & Backspace::delete_one_line()   ;自定义的函数
+
+
+;-------------------------------------------------------------------------------------------------------------
+Insert & Tab::Send,{Home}　　　　{Down}  ;添加四个全角空格，缩进，顺便换一行
+Insert & delete::func_wordpress_change_to_soft_enter()
+Insert & End::Send,{Down}{End}          ;配合使用软回车、换行
+
+Insert & ]::SetTimer, Right_func, 1500 
+Insert & [::SetTimer, Left_func, 1500 
+
+;------------------------------  functions -----------------------
+;wordpress 文字修改，这个是添加软回车，wordpress  需要一整块的文字，
+func_wordpress_change_to_soft_enter(){           
+Send,{End}
+Sleep, 50
+Send,{delete}
+Sleep, 50
+Send,{Shift down}{Enter}{Shift up}{End}
 return
 }
-CapsLock & ]::SetTimer, Right_func, 1500 
-CapsLock & [::SetTimer, Left_func, 1500 
 Right_func:
 Send,{Right}
 return
@@ -350,11 +538,59 @@ Left_func:
 Send,{Left}
 return
 
+;Abandoned
+;CapsLock & c::
+;using_shift_to_help_typing_in_Chinese:=using_shift_to_help_typing_in_Chinese=1?0:1   
+;ToolTip, 开关shift功能，用 shift 组合键帮忙打中文。`n 当前状态%using_shift_to_help_typing_in_Chinese%, 100, 150
+;SetTimer, RemoveToolTip, -5000
+;return
+
+;clipboard text replace, failing function. 暂时放弃，处理剪切板里的文字挺麻烦的。
+;SC027 & m::replace_enter_to_soft_enter()   ;
+;replace_enter_to_soft_enter(){        ;这个有点问题，字符串替换不行，函数不能用。
+;SoundBeep, 3000, 100  ;频率3000hz，时长100ms
+;Send {Ctrl Down}c{Ctrl Up}
+;Clipboard := StrReplace(Clipboard, "`r`n", "xxxxx")
+;Send {Ctrl Down}v{Ctrl Up}
+;return
+;}
+
+;toggle insert mode with notification. But insert mode in win 10 is not usable; only old software support it. In Office Word you need to go to option and turn it on.
+Capslock & Insert:: 
+GetKeyState, InsertState, Insert, T
+If InsertState = U ;If insert is off 
+{ 
+MsgBox, 260, , Are you sure you want to enable insert?, 5 
+} 
+If InsertState = D ;If insert is on 
+{ 
+MsgBox, 4, , Are you sure you want to disable insert?, 5 
+} 
+IfMsgBox No 
+return 
+else IfMsgBox Timeout 
+return 
+Else 
+Send {Insert} 
+return
+
+delete_one_line(){
+Send,{Home}{Shift down}{End}{Shift up}
+Sleep,1
+Send,{BackSpace}  ;删除一行，而不是删除所有文字，功能挺顺手的。
+return
+}
+
+Func_flip_IME_state(){
+;Func_alt_shift()
+Func_ctrl_space()  ; for most of people
+;Send,{Ctrl}
+}
+
 
 ; 用系统的切换语言
 Func_alt_shift(){
-    Send, {Alt down}{Shift}{Alt up}
-    return 0
+Send, {Alt down}{Shift}{Alt up}
 }
 Func_ctrl_shift(){
     Send, {Ctrl down}{Shift}{Ctrl up}
@@ -365,17 +601,44 @@ Func_ctrl_space(){
 Send, {Ctrl down}{Space}{Ctrl up}
     return 0
 }
-
-
-Function_Set_Language(target_state) {
-	SetCapsLockState, AlwaysOff   
-	if ( target_state <> IME_GET()){  ; 只有想要切换的语言和当前语言不同的时候才切换。  
-;中文1 不等于英文0时，切换；也有妙用，例如数字0不等于 1 or 0， 就相当于“翻转当前状态”
-		Func_ctrl_shift()   ;切换到另一种语言。
-	}
-    Return 0
+;全角半角切换。
+Func_flip_Full_width(){
+Send, +{Space}
+    return 0
 }
 
+
+
+; This is simple enough. We track IME state by ourself.
+; If the state in the program doesn't synchronize to the real IME state, just make them the same using mouse clicks.
+
+;para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
+;para out: no output, everything is stored in global varibles.
+
+Function_Set_Language(target_state) {
+	SetCapsLockState, AlwaysOff   ;turn off Captitals
+	Func_toggle_Full_half_width(0)  ;turn off Full-width characters.
+	if ( target_state <>Current_IME_State ){  ; 9 ≠ 1 and 9 ≠ 2 ，一定会接环只有想要切换的语言和当前语言不同的时候才切换。  
+	Func_flip_IME_state()
+	Current_IME_State := 3-Current_IME_State    ;jump between 1,2
+	}
+	else{ ;nothing changes
+	}
+Return 0
+}
+
+;(for ascii art) 
+; para in :  Current_IME_Is_half_width: "0" for normal and "1" to Full-width Unicode .
+;para out:   no output, everything is stored in global varibles.
+Func_toggle_Full_half_width(target_HF){
+	if ( target_HF <>Current_IME_Is_half_width ){
+	Func_flip_Full_width() 
+	Current_IME_Is_half_width := 1-Current_IME_Is_half_width  ;jump between 0,1
+	}
+	else{ ;nothing changes
+	}
+Return 0
+}
 
 
 RemoveToolTip:
@@ -383,134 +646,3 @@ ToolTip
 return
 
 
-CapsLock & T::
-; 变成上标，不推荐。最好使用直接是上下标的  unicode码。
-Send,{Shift down}{Left}{Shift up}
-Send,{Ctrl down}{Shift down}={Shift up}{Ctrl up} 
-Send,{Left}
-return
-CapsLock & G::
-; 变成下标，不推荐。最好使用直接是上下标的  unicode码。
-Send,{Shift down}{Left}{Shift up}
-Send,{Ctrl down}={Ctrl up} 
-Send,{Left}
-return
-
-;CapsLock & c::
-;using_shift_to_help_typing_in_Chinese:=using_shift_to_help_typing_in_Chinese=1?0:1   
-;ToolTip, 开关shift功能，用 shift 组合键帮忙打中文。`n 当前状态%using_shift_to_help_typing_in_Chinese%, 100, 150
-;SetTimer, RemoveToolTip, -5000
-;return
-
-
-
-
-;-------------------------------------------------------------------------------------------------------------
-;cap+3 4 5 wordpress增强功能。 cap+t, cap+g   数字上标、下标的功能。
-;cap+c 开关shift加强中文的功能。通过开关保持正常功能。
-;cap+v 开关移动鼠标，uiohjkl；nm等直接用于用于鼠标的移动。
-;最后一点忠告，千万不要修改tab的功能，很影响使用！
-
-CapsLock & a::Send,{Left}
-CapsLock & d::Send,{Right}
-
-;Send,{Down}
-
-CapsLock & i::MouseMove, 0, -20, 50, R
-CapsLock & j::MouseMove, -20, 0, 50, R
-CapsLock & k::MouseMove, 0, 20, 50, R
-CapsLock & l::MouseMove, 20, 0, 50, R
-
-;-------------------------------------------------------------------------------------------------------------
-;分号用作打字法加强，上下左右移动键，翻页加强、删除。
-;分号不是常用按键，需要一个特殊的编码"SC027"。分号键（sc027）用作修饰键，配合asdf等输入。
-
-+SC027::Send,{:}   ;保护";"原来的功能
-*SC027::Send,{SC027}   ;保护";"原来的功能
-
-;;不要用 - = 翻页，中文打字法太笨了，会以为你输入了个“=”，而不是向后翻页。正确的方法是用“上下”
-;百度输入法支持“上下”翻页，显示效果也不错，所以配合百度输入法比较好用。
-SC027 & i::Send,{Up}     
-SC027 & j::Send, {Left}     
-SC027 & k::Send, {Down}     
-SC027 & l::Send,{Right}   
-
-SC027 & w::Send,{Shift down}{Up}{Shift up} 
-SC027 & a::Send,{Shift down}{Ctrl down}{Left}{Ctrl up}{Shift up} ;  
-SC027 & s::Send,{Shift down}{Down}{Shift up} 
-SC027 & d::Send,{Shift down}{Ctrl down}{Right}{Ctrl up}{Shift up}
-
-SC027 & e::Send,{Delete}  
-CapsLock & e::Send,{Delete}  
-SC027 & q::Send,{BackSpace}
-CapsLock & Q::Send,{BackSpace}
-SC027 & r::
-SC027 & p::
-delete_one_line()   ;自定义的函数
-return
-
-SC027 & m::
-replace_enter_to_soft_enter()   ;
-return
-
-
-
-SC027 & f::Send, {Enter} 
-SC027 & t::Send, {Enter} 
-
-SC027 & h::Send, {PgUp}     
-SC027 & n::Send,{PgDn}   
-SC027 & u::Send, {Home}     
-SC027 & o::Send,{End}
-
-
-replace_enter_to_soft_enter(){        ;这个有点问题，字符串替换不行，函数不能用。
-SoundBeep, 3000, 100  ;频率3000hz，时长100ms
-Send {Ctrl Down}c{Ctrl Up}
-Clipboard := StrReplace(Clipboard, "`r`n", "xxxxx")
-Send {Ctrl Down}v{Ctrl Up}
-return
-}
-;---------------------------------------------------------------------------------
-;撇号  '   ，分号右边的那个按键，的重映射，这里的功能删除了（功能太多太难记住了）
-
-
-
-;-------------------------------------------------------------------------------------------------------------
-CapsLock & 3::Send,{Home}{Space 4}{Down}  ;添加四个空格，缩进
-CapsLock & 4::           ;wordpress 文字修改，这个是添加软回车，wordpress  需要一整块的文字，
-Send,{End}
-Sleep, 50
-Send,{delete}
-Sleep, 50
-Send,{Shift down}{Enter}{Shift up}{End}
-return
-
-CapsLock & 5::          ;配合使用软回车、换行
-Send,{Down}{End}
-return
-
-
-
-
-
-
-
-IME_GET(WinTitle="")
-;-----------------------------------------------------------
-; IMEの状態の取得      ，获得输入法（Input Method）的中英文状态。 1是输入法打开（日文 or 中文），0 是英文
-;    対象： AHK v1.0.34以降
-;   WinTitle : 対象Window (省略時:アクティブウィンドウ)
-;   戻り値  1:ON 0:OFF
-;-----------------------------------------------------------
-{
-    ifEqual WinTitle,,  SetEnv,WinTitle,A
-    WinGet,hWnd,ID,%WinTitle%
-    DefaultIMEWnd := DllCall("imm32\ImmGetDefaultIMEWnd", Uint,hWnd, Uint)
-    ;Message : WM_IME_CONTROL  wParam:IMC_GETOPENSTATUS
-    DetectSave := A_DetectHiddenWindows
-    DetectHiddenWindows,ON
-    SendMessage 0x283, 0x005,0,,ahk_id %DefaultIMEWnd%
-    DetectHiddenWindows,%DetectSave%
-    Return ErrorLevel
-}
