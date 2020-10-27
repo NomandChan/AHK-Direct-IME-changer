@@ -3,14 +3,14 @@
 
 
 ;-------------------------------------------------------------------------------------------------------------
-;环境设置
-#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn  ; Enable warnings to assist with detecting common errors.
+;Environment settings 环境设置
+#NoEnv 
+#Warn  
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
-SetCapsLockState, AlwaysOff  
 
 
+;Tracking variable settings 环境设置
 global Current_IME_State:= 1    ;✨1 is  Eng, 2 is Chinese,  (IMEs are too complicated and way too bloated to extract the key info we need, so we better track the states by ourself. )✨
 global Current_IME_Is_half_width:= 0  ;✨ "1" is full-width input mode, "0" is normal. ✨
 global using_keyboard_controlling_mouse:=0                                                                                                                                                                                                            
@@ -18,6 +18,8 @@ global using_shift_to_help_typing_in_Chinese:=1
 global n_mouse_move_momentum:=0  
 global Caps_Times:= 0        ; 没啥用，这里可以删。用几个变量为脚本增加一些功能，但是这些功能都太复杂，例如点 3 次某个键， 点 4 次某个键，触发什么什么功能，需要变量来记录。但最后我都删了，因为自己都记不住。
 global StartTime:= 0
+
+SetCapsLockState, AlwaysOff  
 
 
 ;-------------------------------------------------------------------------------------------------------------
