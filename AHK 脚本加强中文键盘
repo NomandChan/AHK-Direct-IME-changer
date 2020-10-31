@@ -1,3 +1,4 @@
+; version 1, easy to use and understand.
 ; Quick typing and text editing!    ; use like any other AHK script.
 ;这个脚本控制着语言切换和快速输入数学符号，两个功能。 使用方法：可以直接新建 txt，然后更名为 xxx.ahk，复制全部代码，运行即可使用。说明见 readme
 
