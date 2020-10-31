@@ -1,4 +1,5 @@
-﻿;advanced version, need run in administrator mode.
+
+;script 2, advanced version, need run in administrator mode.
 ; enhanced text selecting funcion. Quick typing and editing is the same
 ;-------------------------Caps + wasd  to move ------------------------
 ;                      Q              W             E              R 
@@ -144,12 +145,12 @@ SetCapsLockState, AlwaysOff
 :ok10:youxiang::15601360539@163.com
 :ok10:mima::john_cenam
 
-:ok10:qq::1410046075
-:ok10:shouji::15601360539
-:ok10:dizhi::北京市石景山区古城路2栋80号   北京市石景山区古城路2栋5单元501
-:ok10:k4::kanriluo04
-:ok10:k6::w6789e7890
-:ok10:sfz::110107199801120333
+:ok10:qq::14xxxxxxxxxxxxxxxxxxxxxxxxxxx5
+:ok10:shouji::156xxxxxxxxxxxxxxxxxxxxxxxxxxxq12
+:ok10:dizhi::北京市石景山区xxxxxxxxxxxxxxxxxxxxxxxxxxx
+:ok10:k4::44xxxxxxxxxxxxxxxxxxxxxxxxxxx4
+:ok10:k6::w67112348111119e7890
+:ok10:sfz::110107xxxxxxxxxxxxxxxxxxxxxxxxxxx3
 :ok10:jiji::基极
 :ok10:jidianji::集电极
 :ok10:bji:: 基极
@@ -552,8 +553,8 @@ return
 
 Func_flip_IME_state(){
 ;Func_alt_shift()
-;Func_ctrl_space()
-Send,{Ctrl}
+Func_ctrl_space()
+;Send,{Ctrl}
 }
 
 
