@@ -1,12 +1,12 @@
-;script 2, advanced version, need run in administrator mode.
+;Typing_Math_Greek_letters.ahk, script 2, advanced version, need run in administrator mode.
 ; enhanced text selecting funcion. Quick typing and editing is the same
 ;-------------------------Caps + wasd  to move  (double tap aa/dd to fast move)------------------------
-;              Q              W             E              R 
-;        backspace          ↑(!)          delete        home(!)     
-;              A              S             D             F 
-;            ←(!)           ↓(!)          →(!)        end(!)         
-;              Z               X            C             V 
-;        redo (ctrl+z)        cut          copy         paste           
+;                      Q              W             E              R 
+;                backspace       ↑(!)          delete        home(!)     
+;                      A              S              D             F 
+;                    ←(!)           ↓(!)              →(!)        end(!)         
+;                      Z               X              C             V 
+;          redo (ctrl+z)        cut            copy      paste           
 ;--------------------Caps + Space + wasd to rapidly move---------------------------------
 
 
@@ -150,16 +150,16 @@ SetCapsLockState, AlwaysOff
 :ok10:sum:: Σ ;大写 s 加 撇号也行。
 :ok10:vec:: ⃗  ;vector 向量箭头 可能显示不出来
 
-:ok10:email::cA𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸@gmail.com
-:ok10:youxiang::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸@163.com
+:ok10:email::c15601360539@gmail.com
+:ok10:youxiang::15601360539@163.com
 :ok10:mima::john_cenam
 
 :ok10:qq::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
-:ok10:shouji::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
-:ok10:dizhi::北京市A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸 A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸501
-:ok10:k4::kA𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸4
-:ok10:k6::wA𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸0
-:ok10:sfz::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸3
+:ok10:shouji::1A𝐀A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸𝕬𝙰𝔸
+:ok10:dizhi::北京市A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸0号   北京市石A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸01
+:ok10:k4::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:k6::w6A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸789e7890
+:ok10:sfz::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
 :ok10:jiji::基极
 :ok10:jidianji::集电极
 :ok10:bji:: 基极
@@ -390,17 +390,17 @@ isSpace_pressing := false
 
 Start_time := A_TickCount 
 Pressing_Caps_TimeLength := 0
-
+threshold_time := 150
 Loop
 {
-	Sleep, 90
+	Sleep, 50
 	func_record_keys()
 	check_is_there_double_tap()
 	
 	isCaps_pressing := GetKeyState("CapsLock", "P")
 	Pressing_Caps_TimeLength := A_TickCount - Start_time
 	isSpace_pressing := GetKeyState("Space", "P") 
-	ToolTip, In the loop of CAPSLOCK!!`npriorKey = %A_PriorKey% `t number =%A_Index%  `nisCaps_pressing = %isCaps_pressing% isSpace_pressing = %isSpace_pressing%`n`n Start_time =%Start_time% Pressing time = %Pressing_Caps_TimeLength%`n K123= %K1% %K2% %K3% `n time span = %K12_T_span%` Double Tap is happening : %is_double_tap_happening%  , 100, 150    
+	;ToolTip, In the loop of CAPSLOCK!!`npriorKey = %A_PriorKey% `t number =%A_Index%  `nisCaps_pressing = %isCaps_pressing% isSpace_pressing = %isSpace_pressing%`n`n Start_time =%Start_time% Pressing time = %Pressing_Caps_TimeLength%`n K123= %K1% %K2% %K3% `n time span = %K12_T_span%` Double Tap is happening : %is_double_tap_happening%  , 100, 150    
 ;----------------- Caps +Space + wasd.. to select ----------------------------
 	if(isSpace_pressing){
 		if( GetKeyState("A", "P"))
@@ -436,34 +436,38 @@ Loop
 		Cs()
 	if( GetKeyState("R", "P"))
 		Cr()
+
+;if(A_PriorKey = "Capslock" and  Pressing_Caps_TimeLength >threshold_time )
+	;ToolTip, Now release for CHN , 100, 150     ; It should be short, so don't need this tip.
 }
 Until (isCaps_pressing = 0) ; AHK don't use "==" to compare boolean.
 
 ;-----------------  Switching language  ----------------------------
 	if( A_PriorKey = "Capslock" ){   ;filter other combination of keys.
-		if (Pressing_Caps_TimeLength < 500) {
-			Function_Set_Language(9)  ;翻转中英文。2中文，1 英文 ;para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
-		}
-		else if (Pressing_Caps_TimeLength < 1000) {   ;(英文的按键时长要 大于 200 且 小于400ms,中文 <1000ms）
-			Function_Set_Language(1)
-			SoundBeep, 1560, 100  ; sound frequency 3000hz，duration 100ms
+
+		; toggle logic  翻转中英文。 parameter 2 = 中，1 = ENG，  "9"  = toggle
+		;if (Pressing_Caps_TimeLength < 500) {
+		;	Function_Set_Language(9)  ;
+		;}
+
+		;designate logic :    tap for Eng, long pressing for Chinese.
+		if (Pressing_Caps_TimeLength < threshold_time) {   
+			Function_Set_Language(1)      ;Eng
+			;SoundBeep, 1560, 100  ; sound frequency 3000hz，duration 100ms
 		}	
 		else if (Pressing_Caps_TimeLength < 1500) {
-			Function_Set_Language(2)   ;代码中 IME 2 中文，  1 英文
+			Function_Set_Language(2)      ;Chn     
 		}
 		else  {
 			Send,{LButton}
 		}
 	}
-	else {
-		ToolTip, 您使用了其他组合键，将不触发切换语言功能。 , 100, 150
-	}
 
 	if(Current_IME_State==1){
-		ToolTip, The IME is English `n You have been holding CapsLock %Pressing_Caps_TimeLength%ms 。`n  , 1500, 500   
+		ToolTip, The IME is English `n You have been holding CapsLock %Pressing_Caps_TimeLength%ms 。`n  , 100, 300   
 	}
 	else{
-		ToolTip, 输入法为中文状态   `n 您按住大写锁定键时长%Pressing_Caps_TimeLength% 毫秒 。`n  , 1600, 550
+		ToolTip, 输入法为中文状态   `n 您按住大写锁定键时长%Pressing_Caps_TimeLength% 毫秒 。`n  , 1660, 750
 	}
 
 
@@ -513,7 +517,7 @@ return
 CapsLock & G::       
 SC027 & G::  
 Send,{Shift down}{Left}{Shift up}
-Send,{Ctrl down}={Ctrl up} 
+Send,{Ctrl down}{=}{Ctrl up} 
 Send,{Left}
 return
 
@@ -799,7 +803,7 @@ global K1_T
 global K2_T
 global K3_T
 global  K12_T_span
-if( ( K1 = K2) && ( K12_T_span > 200)  && ( K12_T_span <400)){   ;This depend on your setting, keyboard repeat delay and repeat rate has something to do with it, however I totally changed the way it works.
+if( ( K1 = K2) && ( K12_T_span > 120)  && ( K12_T_span <400)){   ;This depend on your setting, keyboard repeat delay and repeat rate has something to do with it, however I totally changed the way it works.
 	is_double_tap_happening = 1
 }
 if( ( K12_T_span > 500 || K1<> K2) ){
