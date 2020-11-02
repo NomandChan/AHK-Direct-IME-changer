@@ -1,12 +1,12 @@
 ;Typing_Math_Greek_letters.ahk, script 2, advanced version, need run in administrator mode.
 ; enhanced text selecting funcion. Quick typing and editing is the same
-;-------------------------Caps + wasd  to move  (double tap aa/dd to fast move)------------------------
+;-------------------------Caps + wasd  to move  (double tap aa/dd to fast move)----------
 ;                      Q              W             E              R 
-;                backspace       ↑(!)          delete        home(!)     
+;                backspace          ↑(!)          delete        home(!)     
 ;                      A              S              D             F 
-;                    ←(!)           ↓(!)              →(!)        end(!)         
-;                      Z               X              C             V 
-;          redo (ctrl+z)        cut            copy      paste           
+;                    ←(!)           ↓(!)           →(!)        end(!)         
+;                      Z             X              C             V 
+;             redo (ctrl+z)         cut            copy           paste           
 ;--------------------Caps + Space + wasd to rapidly move---------------------------------
 
 
