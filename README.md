@@ -2,12 +2,17 @@
 # AHK-Swtich Input Method & Type Greek symbols
 Two functions are implemented in this script:
 * Quick switch between English keyboard and Chinese/Japanese/Korean IME. 
-* Lots of hotstring to type math unicode symbole (see below) and Caps+wasd to help typing.<br>
+* Hotstrings to type math unicode symbole (see below) and Caps+wasd to help typing.<br>
 
-For non-english users, it's a pain to type formula and text simutaneously, juggling between them is already annoying for bilinguals and IME is getting in the way. So I made this script to make life easier by using rarely used Capslock to switch language, move typing point and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. 
+To type Greek letters, "α", just a + \` , Σ for S and \`,; To type your email: dontclick@gmail.com for email\`,  ½ ← half\`, ∫ ← integral\`.  ;<br>
+Type superscript/underscript unicode math equation:  " y̅ = C₁eʳ¹ᵗ + C₂eʳ²ᵗ+ C₃eʳ³ᵗ" by pressing Combo keys “Esc +3456rty” or "F1 +123rt" <br>
+To change language, there are two logic presented in script 2. Toggle or designate language. In toggling logic, press Caps is simply control+shift. In designate logic, tap to select ENG and long press to selcet CHN.  <br>
+To move insertion point by "CAPS + wasd". Script 2 is more responsive but need run in Administrator mode: it detect double tap, recording keys and times like another keyboard is running in your physical keyboard; Script 1 is much more easier to understand (and not great)<br>
 
 
-For example, To type "α", just a + \` , Σ for S and \`, dontclick@gmail.com for email\`,  ½ ← half\`, ∫ ← integral\`.  And Combo keys:  ³⁴⁵⁶ʳᵗʸ superscript by pressing Esc +3456rty, underscript for F1 +123 →→₁₂₃ , and others ....<br><br>
+
+
+
 
 &emsp;
 大小写键用来切换输入法，光这一点就值得用😃，脚本内还有了很多数学、短语、希腊字符的快速输入方法，快速切换输入环境、输入特殊字符，用上就是赚到。<br>
@@ -54,7 +59,8 @@ Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
 
 <br><br><br><br><br>
 &emsp;还有很多符号和语法，更详细的说明请见我的网站：https://nomand-chan.xyz/autohotkey%e8%84%9a%e6%9c%ac/
-&emsp;具体实现很细节，请见 script 2 
+具体实现很细节，请见 script 2 
+For non-english users, it's a pain to type formula and text simutaneously, juggling between them is already annoying for bilinguals and IME is getting in the way. So I made this script to make life easier by using rarely used Capslock to switch language, move typing point and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. <br>
 &emsp;将 CapsLock 变废为宝，把长按\短按大写锁定变成切换语言的功能，是中文用户必不可少的自定义；将希腊字母，上下标映射到组合键和快捷键上，而且当用户掌握以后，可以自行添加符号“ ℱℒ𝒵” 等。 再加上组合键、快捷方式，使键盘顺手不少，（甚至用于账号密码保存）。这个脚本是我自己每天都使用的，希望这篇文章帮助大家打开新世界。<br>
 
 &emsp;考虑到网络因素，附加上 AutoHotkey_1.1.33.02_setup 的安装方式：<br>
