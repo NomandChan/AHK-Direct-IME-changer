@@ -1,8 +1,10 @@
 
 # AHK-Swtich Input Method & Type Greek symbols
 Two functions are implemented in this script:
-* Quick switch between English keyboard and Chinese/Japanese/Korean IME. 
-* Hotstrings to type math unicode symbole (see below) and Caps+wasd to help typing.<br>
+* Quick switch between English keyboard and Chinese/Japanese/Korean IME. It detect Language code, tap CAPSLOCK to select English and long press it to CTRL+SHIFT(or anything you want).
+* Caps+ wasd to help type point moving, q/e for delete leftward/rightward. Caps+ B for bold.
+* Hotstrings to type math unicode symbole (see below).
+<br>
 
 To type Greek letters, "α", just a + \` , Σ for S and \`,; To type your email: dontclick@gmail.com for email\`,  ½ ← half\`, ∫ ← integral\`.  ;<br>
 Type superscript/underscript unicode math equation:  " y̅ = C₁eʳ¹ᵗ + C₂eʳ²ᵗ+ C₃eʳ³ᵗ" by pressing Combo keys “Esc +3456rty” or "F1 +123rt" <br>
