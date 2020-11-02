@@ -1,4 +1,4 @@
-;Typing_Math_Greek_letters.ahk, script 2, advanced version, need run in administrator mode.
+;script 2, advanced version, need run in administrator mode.
 ; enhanced text selecting funcion. Quick typing and editing is the same
 ;-------------------------Caps + wasd  to move  (double tap aa/dd to fast move)----------
 ;                      Q              W             E              R 
@@ -154,12 +154,12 @@ SetCapsLockState, AlwaysOff
 :ok10:youxiang::15601360539@163.com
 :ok10:mima::john_cenam
 
-:ok10:qq::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
-:ok10:shouji::1A𝐀A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸𝕬𝙰𝔸
-:ok10:dizhi::北京市A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸0号   北京市石A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸01
-:ok10:k4::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
-:ok10:k6::w6A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸789e7890
-:ok10:sfz::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:qq::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:shouji::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:dizhi::北京A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸   北京市A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:k4::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:k6::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:sfz::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
 :ok10:jiji::基极
 :ok10:jidianji::集电极
 :ok10:bji:: 基极
@@ -482,7 +482,7 @@ CapsLock & 6::SetCapsLockState, On
 CapsLock & 7::SetCapsLockState, Off
 CapsLock & F1::Function_Set_Language(2)    ;切换并指定为中文 para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
 CapsLock & F2::Function_Set_Language(1)   ;切换并指定为英文
-CapsLock & N::Func_toggle_Full_half_width(9)    ;全半角切换
+CapsLock & N::Func_flip_Full_width()    ;全半角切换
 
 CapsLock & Tab::Send,{Enter} 
 CapsLock & `::
@@ -491,7 +491,7 @@ CapsLock & 2::
 CapsLock & 3::Send,{Space} 
 CapsLock & 4::Send,+{Enter} 
 CapsLock & 5::Send,+{Enter} 
-CapsLock & [::Send,{{}   
+CapsLock & [::Send,{{}        
 CapsLock & ]::Send,{}}   
 CapsLock & -::Send,{_}   
 CapsLock & =::Send,{+}   
@@ -591,25 +591,12 @@ return
 }
 
 Func_flip_IME_state(){
-;Func_alt_shift()
-Func_ctrl_space()
+;Send,{Alt down}{Shift}{Alt up}
+Send,{Ctrl down}{Shift}{Ctrl up}
+;Send,{Ctrl down}{Space}{Ctrl up}
 ;Send,{Ctrl}
 }
 
-
-; 用系统的切换语言
-Func_alt_shift(){
-Send, {Alt down}{Shift}{Alt up}
-}
-Func_ctrl_shift(){
-    Send, {Ctrl down}{Shift}{Ctrl up}
-    return 0
-}
-; 用 ime的切换语言,
-Func_ctrl_space(){
-Send, {Ctrl down}{Space}{Ctrl up}
-    return 0
-}
 ;全角半角切换。
 Func_flip_Full_width(){
 Send, +{Space}
@@ -618,36 +605,34 @@ Send, +{Space}
 
 
 
-; This is simple enough. We track IME state by ourself.
-; If the state in the program doesn't synchronize to the real IME state, just make them the same using mouse clicks.
 
 ;para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
 ;para out: no output, everything is stored in global varibles.
 
 Function_Set_Language(target_state) {
 	SetCapsLockState, AlwaysOff   ;turn off Captitals
-	Func_toggle_Full_half_width(0)  ;turn off Full-width characters.
+	Current_IME_State := check_CODE_AHK()
 	if ( target_state <>Current_IME_State ){  ; 9 ≠ 1 and 9 ≠ 2 ，一定会接环只有想要切换的语言和当前语言不同的时候才切换。  
 	Func_flip_IME_state()
-	Current_IME_State := 3-Current_IME_State    ;jump between 1,2
+	;Current_IME_State := 3-Current_IME_State    ; manully record language state, " jump between 1,2"  it's primative and not useful. ; If the state in the program doesn't synchronize to the real IME state, just make them the same using mouse clicks.
 	}
 	else{ ;nothing changes
 	}
 Return 0
 }
-
-;(for ascii art) 
-; para in :  Current_IME_Is_half_width: "0" for normal and "1" to Full-width Unicode .
+	
+;Abandoned,   it's primative and not useful. 
+;para in :  Current_IME_Is_half_width: "0" for normal and "1" to Full-width Unicode .
 ;para out:   no output, everything is stored in global varibles.
-Func_toggle_Full_half_width(target_HF){
-	if ( target_HF <>Current_IME_Is_half_width ){
-	Func_flip_Full_width() 
-	Current_IME_Is_half_width := 1-Current_IME_Is_half_width  ;jump between 0,1
-	}
-	else{ ;nothing changes
-	}
-Return 0
-}
+;Func_toggle_Full_half_width(target_HF){ ;(for ascii art) 
+;	if ( target_HF <>Current_IME_Is_half_width ){
+;	Func_flip_Full_width() 
+;	Current_IME_Is_half_width := 1-Current_IME_Is_half_width  ;jump between 0,1
+;	}
+;	else{ ;nothing changes
+;	}
+;Return 0
+;}
 
 
 RemoveToolTip:
@@ -812,4 +797,52 @@ if( ( K12_T_span > 500 || K1<> K2) ){
 	}
 
 
+}
+
+
+;languageCode_0404 := "Chinese_Taiwan Chinese_PRC Chinese_Hong_Kong"
+; languageCode_0409 := "English_United_States" languageCode_0809 := "English_United_Kingdom" languageCode_0c09 := "English_Australian" languageCode_1009 := "English_Canadian"  languageCode_1409 := "English_New_Zealand" languageCode_1809 := "English_Irish" languageCode_1c09 := "English_South_Africa" languageCode_2009 := "English_Jamaica" languageCode_2409 := "English_Caribbean" languageCode_2809 := "English_Belize" languageCode_2c09 :=  English_Trinidad" languageCode_3009 := "English_Zimbabwe" languageCode_3409 := "English_Philippines" 
+
+
+
+check_CODE_AHK(){
+if !LangID := GetKeyboardLanguage(WinActive("A"))
+{
+	MsgBox, % "GetKeyboardLayout function failed " ErrorLevel
+	return
+}
+ 
+if (LangID = 0x0409)
+	{
+	;ToolTip, Language is EN	
+	return 1
+
+}       
+else if (LangID = 0x080C)
+	ToolTip, Language is FR
+else if (LangID = 0x0813)
+	ToolTip, Language is NL
+else if (LangID = 0x0804)
+	{
+	;ToolTip, Language is CHN	
+	return 2
+}
+	
+
+
+}
+
+
+GetKeyboardLanguage(_hWnd=0)
+{
+	if !_hWnd
+		ThreadId=0
+	else
+		if !ThreadId := DllCall("user32.dll\GetWindowThreadProcessId", "Ptr", _hWnd, "UInt", 0, "UInt")
+			return false
+	
+	if !KBLayout := DllCall("user32.dll\GetKeyboardLayout", "UInt", ThreadId, "UInt")
+		return false
+	
+	return KBLayout & 0xFFFF
 }
