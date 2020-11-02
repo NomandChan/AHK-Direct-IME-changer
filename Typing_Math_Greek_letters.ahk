@@ -1,13 +1,12 @@
-
 ;script 2, advanced version, need run in administrator mode.
 ; enhanced text selecting funcion. Quick typing and editing is the same
-;-------------------------Caps + wasd  to move ------------------------
-;                      Q              W             E              R 
-;                backspace     ↑(!)          delete        home(!)     
-;                      A              S              D             F 
-;                    ←(!)           ↓(!)              →(!)        end(!)         
-;                      Z               X              C             V 
-;          redo (ctrl+z)        cut            copy      paste           
+;-------------------------Caps + wasd  to move  (double tap aa/dd to fast move)------------------------
+;              Q              W             E              R 
+;        backspace          ↑(!)          delete        home(!)     
+;              A              S             D             F 
+;            ←(!)           ↓(!)          →(!)        end(!)         
+;              Z               X            C             V 
+;        redo (ctrl+z)        cut          copy         paste           
 ;--------------------Caps + Space + wasd to rapidly move---------------------------------
 
 
@@ -33,7 +32,18 @@ SetWorkingDir %A_ScriptDir%
 ;Tracking variable settings 环境设置
 global Current_IME_State:= 1    ;✨1 is  Eng, 2 is Chinese,  (IMEs are too complicated and way too bloated to extract the key info we need, so we better track the states by ourself. )✨
 global Current_IME_Is_half_width:= 0  ;✨ "1" is full-width input mode, "0" is normal. ✨
-global using_keyboard_controlling_mouse:=0                                                                                                                                                                                                            
+global using_keyboard_controlling_mouse:=0
+
+;K1 is this key, K2 is prior key, and K3 is the key that befor prior key.  _T for time of pressing.
+global K1:=0  
+global K2:=0
+global K3:=0
+global K1_T:=0  
+global K2_T:=0
+global K3_T:=0
+global K12_T_span:=0
+is_double_tap_happening := 0
+;(just check a to z)
 global using_shift_to_help_typing_in_Chinese:=1 
 global n_mouse_move_momentum:=0  
 global Caps_Times:= 0        ; 没啥用，这里可以删。用几个变量为脚本增加一些功能，但是这些功能都太复杂，例如点 3 次某个键， 点 4 次某个键，触发什么什么功能，需要变量来记录。但最后我都删了，因为自己都记不住。
@@ -54,14 +64,13 @@ SetCapsLockState, AlwaysOff
 
 #UseHook On
 
-; https://en.wikipedia.org/wiki/Beta_Code
-; 详情如何使用请见 https://github.com/scullion/greek.ahk/blob/master/greek.ahk
-; 简单地说，字母加esc 底下的撇号，例如c~ 会自动变成 ξ ，a~ 变成α ，G~大写 shift g ` 变成 Γ
+
+; Inspired by : https://github.com/scullion/greek.ahk/blob/master/greek.ahk
+; 
 
 #Hotstring EndChars `t``
-; 上一句话将 空格触发变成了 tab 和 撇好触发 hotstring。 例如 hotstring 是 a，那么 a~ （加的撇号）会变成 α  , k~ κ l~ λ  见 ahk 的官网， #Hotstring EndChars -()[]{}:;'"/\,.?!`n `t  结束符设置什么都行。
-; 添加o 代表最后的撇号、Tab会被省略。
-; 添加C 代表区分大小写，这样能完整的映射希腊大小写。
+; 将空格触发变成了 tab 和 撇号触发 hotstring。可选这些结束符 #Hotstring EndChars -()[]{}:;'"/\,.?!`n `t  。
+;  例如 a~ （加字母加 esc 底下的撇号）会变成 α  , k~ κ l~ λ   ，、例如c~ 会自动变成 ξ ，a~ 变成α ，G~大写 shift g ` 变成 Γ 。添加o 代表最后的撇号、Tab会被省略。添加C 代表区分大小写，这样能完整的映射希腊大小写字母。
 
 :oC:a::α ; lower case alpha
 :oC:b::β ; lower case beta
@@ -78,9 +87,9 @@ SetCapsLockState, AlwaysOff
 :oC:n::ν ; lower case nu
 :oC:o::ο ; lower case omicron
 :oC:p::π ; lower case pi
-:oC:q::θ ; lower case theta
+:oC:q::θ ; lower case theta  ; https://en.wikipedia.org/wiki/Beta_Code
 :oC:r::ρ ; lower case rho
-:oC:s::σ ; lower case sigma
+:oC:s::σ ; lower case sigma 
 :oC:t::τ ; lower case tau
 :oC:u::υ ; lower case upsilon
 :oC:w::ω ; lower case omega
@@ -141,16 +150,16 @@ SetCapsLockState, AlwaysOff
 :ok10:sum:: Σ ;大写 s 加 撇号也行。
 :ok10:vec:: ⃗  ;vector 向量箭头 可能显示不出来
 
-:ok10:email::c15601360539@gmail.com
-:ok10:youxiang::15601360539@163.com
+:ok10:email::cA𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸@gmail.com
+:ok10:youxiang::A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸@163.com
 :ok10:mima::john_cenam
 
-:ok10:qq::14xxxxxxxxxxxxxxxxxxxxxxxxxxx5
-:ok10:shouji::156xxxxxxxxxxxxxxxxxxxxxxxxxxxq12
-:ok10:dizhi::北京市石景山区xxxxxxxxxxxxxxxxxxxxxxxxxxx
-:ok10:k4::44xxxxxxxxxxxxxxxxxxxxxxxxxxx4
-:ok10:k6::w67112348111119e7890
-:ok10:sfz::110107xxxxxxxxxxxxxxxxxxxxxxxxxxx3
+:ok10:qq::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:shouji::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸
+:ok10:dizhi::北京市A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸 A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸501
+:ok10:k4::kA𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸4
+:ok10:k6::wA𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸0
+:ok10:sfz::1A𝐀𝐴𝑨𝖠𝗔𝘈𝘼𝒜𝓐𝕬𝙰𝔸3
 :ok10:jiji::基极
 :ok10:jidianji::集电极
 :ok10:bji:: 基极
@@ -372,20 +381,26 @@ F2::Send,{F2}    ;
 F1::Send,{F1}    ;  
 
 
+
 ;--------------------------------------------------------------------------------------------------------------------------------------------------
 ~CapsLock::    ; 使用cap 瞬间短按是轮流切换、较短是英文、长按对应中文。同时，还支持指定切换： 
 BlockInput, On
 isCaps_pressing := false
 isSpace_pressing := false
+
 Start_time := A_TickCount 
 Pressing_Caps_TimeLength := 0
+
 Loop
 {
 	Sleep, 90
+	func_record_keys()
+	check_is_there_double_tap()
+	
 	isCaps_pressing := GetKeyState("CapsLock", "P")
 	Pressing_Caps_TimeLength := A_TickCount - Start_time
 	isSpace_pressing := GetKeyState("Space", "P") 
-	;ToolTip, In the loop of CAPSLOCK!!`npriorKey = %A_PriorKey% `t number =%A_Index%  `nisCaps_pressing = %isCaps_pressing% isSpace_pressing = %isSpace_pressing%`n`n Start_time =%Start_time% Pressing time = %Pressing_Caps_TimeLength%  , 100, 150    
+	ToolTip, In the loop of CAPSLOCK!!`npriorKey = %A_PriorKey% `t number =%A_Index%  `nisCaps_pressing = %isCaps_pressing% isSpace_pressing = %isSpace_pressing%`n`n Start_time =%Start_time% Pressing time = %Pressing_Caps_TimeLength%`n K123= %K1% %K2% %K3% `n time span = %K12_T_span%` Double Tap is happening : %is_double_tap_happening%  , 100, 150    
 ;----------------- Caps +Space + wasd.. to select ----------------------------
 	if(isSpace_pressing){
 		if( GetKeyState("A", "P"))
@@ -393,7 +408,7 @@ Loop
 		if( GetKeyState("S", "P"))
 			CSs()
 		if( GetKeyState("D", "P"))
-			CSd()
+			CSd()	
 		if( GetKeyState("W", "P"))
 			CSw()
 		if( GetKeyState("R", "P"))
@@ -404,17 +419,21 @@ Loop
 			dont_select_anymore(A_PriorKey)
 		continue
 	}
-;----------------- Caps + wasd..     to move   ↑←↓→ ----------------------------
-	if( GetKeyState("A", "P"))
+;----------------- Caps + wasd..     to move   ↑←↓→ ----------------------------; caps a = jump to left, like the controller in the game, double tap is run and pressing is walk.
+	if( GetKeyState("A", "P") && is_double_tap_happening) 
+		Ca_double()
+	else if (GetKeyState("A", "P"))
 		Ca()
-	if( GetKeyState("S", "P"))
-		Cs()
-	if( GetKeyState("D", "P"))
+	if( GetKeyState("D", "P") && is_double_tap_happening)
+		Cd_double()
+	else if(GetKeyState("D", "P"))
 		Cd()
 	if( GetKeyState("F", "P"))
 		Cf()
 	if( GetKeyState("W", "P"))
 		Cw()
+	if( GetKeyState("S", "P"))
+		Cs()
 	if( GetKeyState("R", "P"))
 		Cr()
 }
@@ -452,22 +471,38 @@ SetTimer, RemoveToolTip, -1000
 BlockInput, Off
 return
 
-
-CapsLock & B::SetCapsLockState, AlwaysOn     ;cap+[、]、B是中、英、大写指定切换。
-CapsLock & 5::SetCapsLockState, On   
-CapsLock & 6::SetCapsLockState, Off
-CapsLock & [::Function_Set_Language(2)    ;切换并指定为中文 para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
-CapsLock & ]::Function_Set_Language(1)   ;切换并指定为英文
- CapsLock & `::
-CapsLock & N::Func_toggle_Full_half_width(9)    ;全半角切换
-
-
 CapsLock & e::Ce()  
 CapsLock & q::cq()
+CapsLock & B::SetCapsLockState, AlwaysOn     ;cap+[、]、B是中、英、大写指定切换。
+CapsLock & 6::SetCapsLockState, On   
+CapsLock & 7::SetCapsLockState, Off
+CapsLock & F1::Function_Set_Language(2)    ;切换并指定为中文 para in : Current_IME_State "9" to toggle, "1" to English,   "2" to Chinese, 
+CapsLock & F2::Function_Set_Language(1)   ;切换并指定为英文
+CapsLock & N::Func_toggle_Full_half_width(9)    ;全半角切换
+
+CapsLock & Tab::Send,{Enter} 
+CapsLock & `::
+CapsLock & 1::
+CapsLock & 2::
+CapsLock & 3::Send,{Space} 
+CapsLock & 4::Send,+{Enter} 
+CapsLock & 5::Send,+{Enter} 
+CapsLock & [::Send,{{}   
+CapsLock & ]::Send,{}}   
+CapsLock & -::Send,{_}   
+CapsLock & =::Send,{+}   
+CapsLock & SC027::Send,{:}   
 CapsLock & '::Send,{"}   
+CapsLock & ,::Send,{<}   
+CapsLock & .::Send,{>}   
+CapsLock & /::Send,{?}   
 CapsLock & SC02B::Send,{|}  ;backslash and |
-
-
+CapsLock & Backspace::Send,{Backspace}   
+CapsLock & Enter::Send,{Enter}  
+CapsLock & Up::Send,{Up}   
+CapsLock & Down::Send,{Down}   
+CapsLock & Left::Send,{Left}   
+CapsLock & Right::Send,{Right}    
 ;上标 superscript  ;wordpress enchance 增强富文本上下标功能。 
 CapsLock & T::       
 SC027 & T::  
@@ -666,8 +701,15 @@ sleep, 200
 Ca(){
 Send,{Left}
 }
+Ca_double(){
+Send,^{Left}
+}
+
 Cs(){
 Send,{Down}
+}
+Cd_double(){
+Send,^{Right}
 }
 Cd(){
 Send,{Right}
@@ -717,5 +759,53 @@ if( Last_key = "a" or Last_key = "w" or Last_key = "r")
 Send,{Left}
 if( Last_key = "s" or Last_key = "d" or Last_key = "f")
 Send,{Right}
+
+}
+
+
+
+
+func_record_keys(){
+abcd_xyz := "a"
+global K1 
+global K2
+global K3
+global K1_T
+global K2_T
+global K3_T
+global  K12_T_span
+	Loop 26{  
+		abcd_xyz := Chr(A_Index+96)
+		if(GetKeyState( abcd_xyz, "P")){   ; if any char in alphabet pressed, record the time and which.
+		K3:= K2
+		K2:= K1
+		K1:= Chr(A_Index+96)  
+
+		K3_T:=K2_T
+		K2_T:=K1_T
+		K1_T:=A_TickCount   
+
+		K12_T_span := K1_T - K2_T
+		}
+
+	}
+}
+check_is_there_double_tap(){
+global is_double_tap_happening
+global K1 
+global K2
+global K3
+global K1_T
+global K2_T
+global K3_T
+global  K12_T_span
+if( ( K1 = K2) && ( K12_T_span > 200)  && ( K12_T_span <400)){   ;This depend on your setting, keyboard repeat delay and repeat rate has something to do with it, however I totally changed the way it works.
+	is_double_tap_happening = 1
+}
+if( ( K12_T_span > 500 || K1<> K2) ){
+	is_double_tap_happening = 0
+
+	}
+
 
 }
