@@ -614,11 +614,12 @@ Function_Set_Language(target_state) {
 	Current_IME_State := check_CODE_AHK()
 	if ( target_state <>Current_IME_State ){  ; 9 ≠ 1 and 9 ≠ 2 ，一定会接环只有想要切换的语言和当前语言不同的时候才切换。  
 	Func_flip_IME_state()
-	;Current_IME_State := 3-Current_IME_State    ; manully record language state, " jump between 1,2"  it's primative and not useful. ; If the state in the program doesn't synchronize to the real IME state, just make them the same using mouse clicks.
+	Current_IME_State := 3-Current_IME_State
 	}
 	else{ ;nothing changes
 	}
 Return 0
+;manully record language state, " jump between 1,2"  it's primative and not useful.  better use language code. 
 }
 	
 ;Abandoned,   it's primative and not useful. 
