@@ -27,10 +27,13 @@ checkCurrentKeyboardLayout() {
     }
 ```
 
-# 下面的都过时了，是 AHK V1 的代码，没什么参考价值了。
+# AHK V2 各种小功能，调用搜索、查词等等
 写这么多，只适合我自己；只有一点学习分享价值，还是放在这留着吧……
+语音播报选择的txt、发送给网页进行搜索，鼠标边缘手势等等等，太多了懒得写介绍，希望学习 AHK V2 的人可以自己进去翻翻学习。有些函数前面有注释，VSCODE 插件能看见，还可以跳转定义，一定要装这个插件： autohotkey2 language support。
 AHK 可玩性太高了，可以通过任意的按键进行功能组合、调用程序，但我心心念念的功能就是切换输入法。学会这个两年之久，终于让我找到了直接切换的方法。我写过无数逻辑切换的方法，麻烦死了。
 
+
+下面有两个文件是 AHK V1 的代码，没什么参考价值了。
 
 ## Functions AHK V1 script:
 * Quick switch between English keyboard and Chinese/Japanese/Korean IME. It detect Language code, tap CAPSLOCK to select English and long press it to CTRL+SHIFT(or anything you want).
