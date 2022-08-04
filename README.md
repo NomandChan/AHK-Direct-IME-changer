@@ -1,6 +1,38 @@
 
-# AHK-Swtich Input Method & Type Greek symbols
-Two functions are implemented in this script:
+# AHK 直接切换中英文 Swtich Input Method & Type Greek symbols
+
+
+## 直接切换中文、英文的方法！ 使用 windows 的接口
+
+使用 windows 接口 不用任何设置、不用快捷键！
+```
+RAlt::PostMessage, 0x50, 0, 0x4090409,, A
+LAlt::PostMessage, 0x50, 0, 0x8040804,, A
+```
+发挥你们的创造力！自己打造智能切换的输入法。例如每次碰  ~Esc:: 都调用这个，就能愉快👌🏻使用 VIM 了
+
+↑↑↑
+参考： http://tll.tl/zh/
+↑↑↑
+這兩行的功能是將::前的按鍵，右Alt或左Alt定義成後面的功能，也就是將現在的鍵盤配置切換為中文(0x4040404)或英文(0x4090409)。同理，你也可以設定成自己想要的任何按鍵（例如，Capslock、LWin、LCtrl、AppsKey）。用這種方式重新指定修飾鍵（Modifier，也就是Alt、Ctrl這類要和其他按鍵組合才有功能的鍵）並不會破壞其他快速鍵，因此相當於是鍵盤多了一個快捷鍵。  ; 0x4040404 是繁体中文！，简体中文的编号是 0x8040804
+
+别的键盘布局可以通过这个函数查看！
+```
+checkCurrentKeyboardLayout() {
+    ThreadId := DllCall("User32.dll\GetWindowThreadProcessId", "Ptr", WinExist("A"), "Ptr", 0, "UInt")
+
+    hCurrentKBLayout := DllCall("User32.dll\GetKeyboardLayout", "UInt", ThreadId, "Ptr")
+    msgbox(hCurrentKBLayout)
+    return
+    }
+```
+
+# 下面的都过时了，是 AHK V1 的代码，没什么参考价值了。
+写这么多，只适合我自己；只有一点学习分享价值，还是放在这留着吧……
+AHK 可玩性太高了，可以通过任意的按键进行功能组合、调用程序，但我心心念念的功能就是切换输入法。学会这个两年之久，终于让我找到了直接切换的方法。我写过无数逻辑切换的方法，麻烦死了。
+
+
+## Functions AHK V1 script:
 * Quick switch between English keyboard and Chinese/Japanese/Korean IME. It detect Language code, tap CAPSLOCK to select English and long press it to CTRL+SHIFT(or anything you want).
 * Caps+ wasd to help type point moving, q/e for delete leftward/rightward. Caps+ B for bold.
 * Hotstrings to type math unicode symbole (see below).
@@ -60,16 +92,7 @@ Install AHK → create txt and copy it → change .txt suffix to .ahk → run it
     ⁺⁻⁼ ⁽ ⁾ ₀ ₁ ₂ ₃⁺⁻ᐧ／÷×-+≠≡≈≝≤≥∂∞∘∫∫∂∮∯∇  ◠◡ ), ᵘ ᵛ ʷ ˣ ʸ ᶻ ᴮ ᴰ ᴱ ( ₐ ₑ ₕ ᵢ ⱼ ₖ ₗ ₘ ₙ  ᵅ ᵝ ᵞ ᵟ ᵋ ᶿ ᶥ ᶲ ᵠ ᵡ ᵦ ᵧ ᵨ ᵩ ᵪ ).
 
 <br><br><br><br><br>
-&emsp;还有很多符号和语法，更详细的说明请见我的网站：https://nomand-chan.xyz/autohotkey%e8%84%9a%e6%9c%ac/
 具体实现很细节，请见 script 2 
 For non-english users, it's a pain to type formula and text simutaneously, juggling between them is already annoying for bilinguals and IME is getting in the way. So I made this script to make life easier by using rarely used Capslock to switch language, move typing point and making hotstring and quick replacement for math symbols, greek letters, and selfdefined unicode strings. <br>
 &emsp;将 CapsLock 变废为宝，把长按\短按大写锁定变成切换语言的功能，是中文用户必不可少的自定义；将希腊字母，上下标映射到组合键和快捷键上，而且当用户掌握以后，可以自行添加符号“ ℱℒ𝒵” 等。 再加上组合键、快捷方式，使键盘顺手不少，（甚至用于账号密码保存）。这个脚本是我自己每天都使用的，希望这篇文章帮助大家打开新世界。<br>
 
-&emsp;考虑到网络因素，附加上 AutoHotkey_1.1.33.02_setup 的安装方式：<br>
-链接：https://pan.baidu.com/s/1JSarNM9XYON0rMu5y4XEvQ  <br>
-提取码：h2l7  <br>
-
-## 
-Full-width characters 全角切换：astutecat/autofullwidth<br>
-Mouse Gesture Using AHK : Pyonkichi's Mouse Gesture<br>
-Mouse Gesture Using C# APP: WGestures 鼠标手势，免费软件，颜值很高、功能很棒。<br>
