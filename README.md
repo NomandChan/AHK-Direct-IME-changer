@@ -33,6 +33,29 @@ LAlt::PostMessage, 0x50, 0, 0x8040804,, A
         en()
     }
 }
+
+~Esc::en()
+Capslock::
+{ 
+    SetCapsLockState("AlwaysOff")
+    en()
+    
+}
+Shift::smartVimCN()
+RAlt::cn()
+
+;  LCtrl::cn() 这个不能要
+
+smartVimCN(){
+    if WinActive("ahk_exe Obsidian.exe"){   ; 这个笔记本里才生效，其他软件不生效。  encn 切换及时 vim 状态错了也会被冲刷掉。
+        en()
+        Send("{i}")  ; VIM 的输入模式
+        cn()       
+    }
+    else {
+        cn()
+    }
+}
 ```
 
 
