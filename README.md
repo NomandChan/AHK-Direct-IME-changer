@@ -12,26 +12,29 @@ LAlt::PostMessage, 0x50, 0, 0x8040804,, A
 发挥你们的创造力！自己打造智能切换的输入法。例如每次碰  ~Esc:: 都调用这个，就能愉快👌🏻使用 VIM 了。
 我个人最喜欢的切换方式：并击 “io”→ 中文， “we"→ Eng ，只有同时按下才触发，不影响正常打字：
 ```
-~i::
-~o::
+; ~i::
+~k::
 {
     ; check_io_pressed_in_the_same_time()
-    if( GetKeyState("i") and GetKeyState("o")  ){
+    ; if( GetKeyState("j") and GetKeyState("i") and GetKeyState("o"))
+    if( GetKeyState("i")){
         Send("{bs 2}")
         Sleep(200)
         cn()
-    }
+        
+        
+    } 
+        
 }
-
-~e::
-~w::
+; ~e::
+~d::
 {
     ; check_ew_pressed_in_the_same_time()   
-    if(  GetKeyState("e") and GetKeyState("w")  ){
+    if(  GetKeyState("e") and GetKeyState("d")  ){
         Send("{bs 2}")
         Sleep(200)
         en()
-    }
+    } 
 }
 
 ~Esc::en()
