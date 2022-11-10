@@ -1,5 +1,5 @@
 #SingleInstance
-
+ 
 A_HotkeyInterval := 2000  ; This is the default value (milliseconds).
 A_MaxHotkeysPerInterval := 200
 SetCapsLockState("AlwaysOff")  
@@ -13,21 +13,19 @@ InstallKeybdHook
 InstallMouseHook
 
 
-
-
-
-; 函数最好直接放在第一个本体，后面的再慢慢添加。
-; 多个文件看得清楚，功能相当于复制到这里。
+; 函数最好直接放在第一个本体，后面的细节再慢慢添加。
+; 多个文件看得清楚，功能相当于复制到这里。 vscode 装了 ahkv2-lsp 插件以后，在文件名上点击 F12 可以直接跳转过去。
 #Include "%A_ScriptDir%\Modifiers.ahk"
 #Include "%A_ScriptDir%\Basic_Remap.ahk"
 #Include "%A_ScriptDir%\HotStrings.ahk"
 #Include "%A_ScriptDir%\Mouse.ahk"
-#Include "%A_ScriptDir%\EMACS.ahk"
 
-
+; vscode 拆分两列用菜单进行选择就行了： alt+v； 编辑器布局 L ；双列 T；  而传统软件 Obsidian 需要 alt + shift + ijkl 切换， n/m 新建分列。
+; 切换直接用 ctrl +1/2 就能切换
+; C:\Users\c1560\scoop\apps\autohotkey\1.1.33.09\v2.0-beta.7
 
 A_TrayMenu.Add()  ; 创建分隔线.
-A_TrayMenu.Add("虚拟桌面1", MenuHandler1)  ; 创建新菜单项.
+A_TrayMenu.Add("虚拟桌面1 Ctrl+Win+←→", MenuHandler1)  ; 创建新菜单项.
 A_TrayMenu.Add("虚拟桌面2", MenuHandler2)  
 A_TrayMenu.Add("虚拟桌面3", MenuHandler3)  
 A_TrayMenu.Add("Pomodoro Timer", MenuHandler4)  
@@ -37,6 +35,119 @@ I_Icon := A_ScriptDir . "\open-book.png"
 if FileExist(I_Icon)
 TraySetIcon(I_Icon)
 
+
+
+
+
+cn(mode := "两次切换Ctrl+Shift", smart_half:=0){  
+    switch mode{
+        ; 通过两次 ctrl+shift 切换，利用中文输入法的默认状态变成中文。（假设平时只使用 shift，并且默认状态是 chn）
+        case "两次切换Ctrl+Shift":   
+        Func_flip_IME_state("^+")  
+        Sleep 30
+        Func_flip_IME_state("^+")  
+
+
+        ;1 2 两种中文输入法 
+        case "set win hotkey":   Send("!+{2}")   
+        case "强制通过 postmessage 切换输入法": PostMessage 0x0050, 0, 0x8040804,, "A"  
+             ; 0x4040404 是繁体中文！，简体中文的编号是什么  0x8040804
+
+
+;下面切换的方法都不太靠谱
+        case "TrackingByMyself":  Function_Set_Language_by_tracking(2)    
+        case "flip_toogle":            Func_flip_IME_state()
+        case "讯飞输入法的特殊逻辑Ctrl+. space":       Send("^.^{Space 2}")  ; 利用 全角半角切换一定是中文内这个特性进行切换。
+        case "讯飞输入法的特殊逻辑Ctrl+. shift":       Send("^.{Shift 2}")  ; 利用 全角半角切换一定是中文内这个特性进行切换。
+
+    }
+    clear_mouse_flag_altered()
+    if( smart_half == 1)
+        Other_things_when_toggling_IME()  ; vscode 之中使用半角中文.
+}
+
+
+; 只是 set language 的快捷入口，不要做派发！
+en(mode := "两次切换Ctrl+Shift"){  
+    switch mode{
+        ; 通过两次 ctrl+shift 切换，利用中文输入法的默认状态变成中文。（假设平时只使用 shift，并且默认状态是 chn）
+        case "两次切换Ctrl+Shift":   
+        Func_flip_IME_state("^+")  
+        Sleep 30
+        Func_flip_IME_state("^+")  
+        Func_flip_IME_state("Shift")
+
+        case "set win hotkey":   Send("!+{3}")   ;  win11 快捷键丢失的 bug 更严重了，甚至不是重启后丢失?? 设置丢失只是看不见，但还能用
+        case "强制通过 postmessage 切换输入法": PostMessage 0x0050, 0, 0x4090409,, "A"  ; 0x0050 is WM_INPUTLANGCHANGEREQUEST.
+
+        ;下面切换的方法都不太靠谱
+        case "TrackingByMyself":  Function_Set_Language_by_tracking(1)    
+        case "flip_toogle":            Func_flip_IME_state()
+        case "讯飞输入法的特殊逻辑Ctrl+. space":       Send("^.^{Space 1}")  ; 利用 全角半角切换一定是中文内这个特性进行切换。
+        case "讯飞输入法的特殊逻辑Ctrl+. shift":       Send("^.{Shift 1}")  ; 利用 全角半角切换一定是中文内这个特性进行切换。
+
+    }
+    clear_mouse_flag_altered()
+    Sleep(100)
+    ; Other_things_when_toggling_IME()
+}
+
+
+
+; switch IME 
+Func_flip_IME_state(mode:="Shift"){
+    
+    switch mode
+    {
+        case "Shift":            Send("{Shift down}{Shift Up}")
+        case "ctrl+space":       Send("^{Space}")
+        case "tilde":   Send("{sc029}")  ; ctrl+shift , alt+shift, grave 这三个是一组
+        case "^":      Send("{Ctrl Down}{Ctrl Up}")   ; ctrl,ctrl+space,shift     这三个是一组
+        case "shift":   Send("{Shift Down}{Shift up}") 
+        case "^+" :     Send("{Ctrl Down}{Shift Down}{Shift up}{Ctrl Up}")   ; 正常是 ctrl + shift，但其实你可以先按shift再按control，这样就没有操作界面了。 没有 GUI 界面反应会快一点。                  ; 或者说。使用 alt 加shift切换语言。 shift + ctrl works in onenote, meanwhile ctrl + shift won't work. I guess it's OSD lagging the windows.
+        case "^space":  Send("^{Space}") 
+        
+    }
+    ; ToolTip("wait to release")
+    ; KeyWait("Shift")
+    ; KeyWait("Alt")
+    ; KeyWait("Ctrl")           
+
+    ToolTip()   
+}
+     
+
+
+!+8::cn("set win hotkey")
+!+9::en("set win hotkey")
+
+; Obsidian 切换搜索时候进入中文（必须要清楚或者等待之前的快捷键松开。
+~^p::TagAlongEN()
+~^!l::TagAlongCN()
+
+TagAlongCN()
+{   
+
+    KeyWait "ctrl"
+    KeyWait "alt"
+    KeyWait "shift" 
+    cn() 
+}
+TagAlongEN()
+{   
+
+    KeyWait "ctrl"
+    KeyWait "alt"
+    KeyWait "shift" 
+    en() 
+}
+checkCurrentKeyboardLayout() {
+    ThreadId := DllCall("User32.dll\GetWindowThreadProcessId", "Ptr", WinExist("A"), "Ptr", 0, "UInt")
+
+    hCurrentKBLayout := DllCall("User32.dll\GetKeyboardLayout", "UInt", ThreadId, "Ptr")
+    msgbox(hCurrentKBLayout)
+    return
+    }
 
 
 MenuHandler1(ItemName, ItemPos, MyMenu) {
@@ -53,35 +164,6 @@ MenuHandler3(ItemName, ItemPos, MyMenu) {
 }
 
 
-global XwhereMwas := 0
-global YwhereMwas := 0
-global M_altered_wait_click:=0
-global Ts:= A_TickCount
-global height_PDF := 1300
-global threshold_idle:= 6000
-global Current_IME_State :=1
-global TimeIdleKeyboardArray:= []
-global flag_mouse_wheel_change:=0 
-global W := A_ScreenWidth - 1    ; 1920  如果屏幕是竖过来的，这个值 AHK 会帮你改变。（但是第一段只执行一次，可能需要重载。）
-global H := A_ScreenHeight - 1  ;  1080
-global index_Time := 0
-global maxValue_Time := 10
-global repeatTime := 0
-
-global using_shift_to_help_typing_in_Chinese:=1
-global n_mouse_move_momentum:=0
-global StartTime:= 0
-global idle_time_number:=0
-
-global Stop_Sitting_counter:=0
-global Stop_Sitting_Lastime_triggered:= A_TickCount
-
-global Press_Start_time
-global now_language :=0
-global repeat_key:=0
-global exclude_apps_string := []
-global MpositionX :=0
-global MpositionY :=0
 
 ; 主要功能
 ; 输入αωκλ 希腊字符、上下标、特殊符号。      ; The hotstring and and formula typing Greek letters example is in the readme on the website. (superscripts and undersccripts)
@@ -158,39 +240,21 @@ updateSharedRepeat( NeedToBeDisplay := "", immediateMode_length := 0){
 
 
 
-global useEnterAsSpace:=0
-Func_Set_Language(num,  method := "Shift")
-{
-    clear_mouse_flag_altered()
+
+Other_things_when_toggling_IME(){
     name := WinGetProcessName("A")
-    global useEnterAsSpace
-    switch method
-    {
-        case "Shift":
-            Send("^{Shift}")
-        case "rime":
-            Send("^+{1}")
-        case "useEnterAsSpace":
-            useEnterAsSpace := 1-useEnterAsSpace
-        case "flip":
-            ; TrackingByMyself
-            Func_flip_IME_state()
-        case "me_tracking":
-            ; TrackingByMyself
-            Function_Set_Language_by_tracking(num)    
-    }
-    ; tooltip, %name% 
-
-
+    ; Sleep(1000)
+     ; tooltip, %name% 
     ; ；----------------------------------------------
     ; 希望默认英文的环境 Code.exe ← VSCODE,      Obsidian.exe  OneCommander.exe
-    if( name == "Code.exe" or  name == "Obsidian.exe" or  name == "OneCommander.exe")
+    if( name == "Code.exe" or  name == "OneCommander.exe")
     {
-        ; Send("^{sc034}")
+        ; Send("^.") ;bug！？ ctrl + 句号 在讯飞输入法竟然能从英文切换到中文！！
+        Send("^{sc034}") ;还是存在？！？！ 原来是因为shift 还没有松手……
     }
     
-    ; msedge.exe  WeChat.exe  ApplicationFrameHost.exe  onenote 和 系统设置的 ahk——exe 都是这个，区分不开
-    else if( name == "msedge.exe" or  name == "ApplicationFrameHost.exe" or  name == "WeChat.exe" )
+    ; msedge.exe  WeChat.exe 。但是  onenote 和 系统设置区分不开、的 ahk——exe 都是这个 ApplicationFrameHost.exe ，区分不开
+    else if( name == "msedge.exe" or  name == "Obsidian.exe" or  name == "ApplicationFrameHost.exe" or  name == "WeChat.exe" )
     {
         ;not change
     }
@@ -213,68 +277,14 @@ Function_Set_Language_by_tracking(target_state) {
     }
 }
 
-
-; switch IME 
-Func_flip_IME_state(mode:="^"){
     
-    switch mode
-    {
-        case "tilde":   Send("{sc029}")  ; ctrl+shift , alt+shift, grave 这三个是一组
-        case "^":      Send("{Ctrl Down}{Ctrl Up}")   ; ctrl,ctrl+space,shift     这三个是一组
-        case "shift":   Send("{Shift Down}{Shift up}") 
-        case "^+" :     Send("{Ctrl Down}{Shift Down}{Shift up}{Ctrl Up}")   ; 正常是 ctrl + shift，但其实你可以先按shift再按control，这样就没有操作界面了。 没有 GUI 界面反应会快一点。                  ; 或者说。使用 alt 加shift切换语言。 shift + ctrl works in onenote, meanwhile ctrl + shift won't work. I guess it's OSD lagging the windows.
-        case "^space":  Send("^{Space}") 
-        
-    }
-    ; ToolTip("wait to release")
-    ; KeyWait("Shift")
-    ; KeyWait("Alt")
-    ; KeyWait("Ctrl")
-
-    ToolTip()   
-}
-         
-
-
-en(mode := "postmessage"){
-    switch mode{
-        case "soft":   Func_Set_Language(1)
-        ; case "forced":   Send("^+{0}")   ; win11 快捷键丢失的 bug 更严重了，甚至不是重启后丢失，是根本设置不上 ctrl+shift+0, 但是 ^+8 非 0 就可以。         ctrl+ nub 浏览器总是占用，那就设置成 alt+shift+2、3 ；89 最适合 不动的姿势。
-        case "forced":   Send("!+{3}")   ; 设置丢失只是看不见，但还能用
-        case "postmessage": PostMessage 0x0050, 0, 0x4090409,, "A"  ; 0x0050 is WM_INPUTLANGCHANGEREQUEST.
-        }
-
-}
-        
-cn(mode := "postmessage"){
-    switch mode{
-        case "soft":   Func_Set_Language(2)  ;soft logic change
-        case "forced":   Send("!+{1}")   ;1 2 两种中文输入法 
-        case "postmessage": PostMessage 0x0050, 0, 0x8040804,, "A"  
-             ; 0x4040404 是繁体中文！，简体中文的编号是什么  0x8040804
-    }
-
-}
-
-checkCurrentKeyboardLayout() {
-    ThreadId := DllCall("User32.dll\GetWindowThreadProcessId", "Ptr", WinExist("A"), "Ptr", 0, "UInt")
-
-    hCurrentKBLayout := DllCall("User32.dll\GetKeyboardLayout", "UInt", ThreadId, "Ptr")
-    msgbox(hCurrentKBLayout)
-    return
-    }
-
-
-; !+8::en()
-; !+9::cn()
+ 
 
 
 
-; IsAlpha("按", "Locale") IsAlpha("ddddddd", "Locale") IsAlpha("   ", "Locale") IsAlpha("111", "Locale")
+; 根据周围字符判断语言环境，有点影响使用，需要复制文本，最终放弃
+; 测试： IsAlpha("按", "Locale") IsAlpha("ddddddd", "Locale") IsAlpha("   ", "Locale") IsAlpha("111", "Locale")
 ; 四个结果是 1 1 0 0， 也就是说不分中文英文，是文字返回1，数组、空格返回0.
-
-
-
 ; ~LButton::
 ; {
 ;     global MpositionX, MpositionY
@@ -287,7 +297,7 @@ checkCurrentKeyboardLayout() {
 ;     MouseGetPos(&MpositionX, &MpositionY, &id, &control)
 ;     ; ToolTip( MpositionX  MpositionY )
 
-;     ; guess := GetAcharactor_and_return_language_clipboard() ; 有点影响使用。放弃
+;     ; guess := GetAcharactor_and_return_language_clipboard() 
 ;     ; ToolTip(guess)
 ;     if ( Abs(MpositionY - LastY) > 500 or Abs(MpositionX - LastX) > 500 ){
 ;             moveFar := 1
@@ -318,6 +328,37 @@ if_temp_toggle_IME_is_ture_then_change_it_back()
         }
 } 
    
+
+
+global XwhereMwas := 0
+global YwhereMwas := 0
+global M_altered_wait_click:=0
+global Ts:= A_TickCount
+global height_PDF := 1300
+global threshold_idle:= 6000
+global Current_IME_State :=1
+global TimeIdleKeyboardArray:= []
+global flag_mouse_wheel_change:=0 
+global W := A_ScreenWidth - 1    ; 1920  如果屏幕是竖过来的，这个值 AHK 会帮你改变。（但是第一段只执行一次，可能需要重载。）
+global H := A_ScreenHeight - 1  ;  1080
+global index_Time := 0
+global maxValue_Time := 10
+global repeatTime := 0
+
+global using_shift_to_help_typing_in_Chinese:=1
+global n_mouse_move_momentum:=0
+global StartTime:= 0
+global idle_time_number:=0
+
+global Stop_Sitting_counter:=0
+global Stop_Sitting_Lastime_triggered:= A_TickCount
+
+global Press_Start_time
+global now_language :=0
+global repeat_key:=0
+global exclude_apps_string := []
+global MpositionX :=0
+global MpositionY :=0
 WatchCursor() 
 { 
     global Current_IME_State
@@ -333,67 +374,56 @@ WatchCursor()
     global YwhereMwas
     MouseGetPos(&xpos, &ypos, &id, &control)
     W := A_ScreenWidth
+    ; ToolTip(A_TimeIdlePhysical)
 
+    global XwhereMwas := xpos
+    global YwhereMwas := ypos
     
-    ;------------------------Pomodoro    --------------
-    ; if(  A_TimeIdlePhysical < 60 * 1000 )   ;1 minutes 过滤掉太远的输入
-    ;     {
-    ;         My_automatic_Pomodoro_Stop_Sitting_function_couting_up()
-    ;     }
+    ;------------------------ Pomodoro    --------------
+    ; AutoMaticPomodoro() 
     
        ; ；------------------------移动距离足够大以后，改变键盘的逻辑---------------
-    if( Abs( XwhereMwas - xpos) + Abs(YwhereMwas - ypos) > 100 and (A_TimeIdleKeyboard >200))
-    {
+    ; if( Abs( XwhereMwas - xpos) + Abs(YwhereMwas - ypos) > 100 and (A_TimeIdleKeyboard >200))
+    ; {
         
-        M_altered_wait_click := 1
-        CoordMode("ToolTip" , "Screen")
-        ToolTip(":altered"  ,0 ,  ypos+ 200,9 )
-        ; SetTimer ()=> ToolTip(,0,9999,9 )  ,-1000
-        if_temp_toggle_IME_is_ture_then_change_it_back()
-    }
+    ;     M_altered_wait_click := 1
+    ;     CoordMode("ToolTip" , "Screen")
+    ;     ToolTip(" "  ,0 ,  9200,9 )
+    ;     ; SetTimer ()=> ToolTip(,0,9999,9 )  ,-1000
+    ;     ; if_temp_toggle_IME_is_ture_then_change_it_back()
+    ; }
 
+
+ 
     ; ；------------------------移动距离足够大以后，改变键盘的逻辑---------------
     
-
-    ; ---------------------  总是 使用偏向切换语言 ----------------
-
+ 
     ; if( Abs( XwhereMwas - xpos) >  700 and !GetKeyState("LButton"))   ;相对移动甚至不需要区分副屏幕。
     ;     {
-    ;         if( ( XwhereMwas - xpos) > 0)
-    ;             en()
-    ;         else
-    ;             cn()
+ 
     ;     }
-
-    ; ---------------------  总是 使用偏向切换语言 ----------------
-
-
-
+ 
 
 
 
 
     ; -----------------------  闲置足够长时间就清除 modifer---------------------
-    t := Mod(A_TimeIdleKeyboard, threshold_idle)           ;      鼠标切换的话 keyboard idle 时间不更新.                 ;  取余是最简单的,不用记录之前是哪个程序,和现在比较.   取余一定要用 后面的 100 ms,而不是开始的 100 ms,不然总是重置 IME.
+    ; t := Mod(A_TimeIdleKeyboard, threshold_idle)           ;      鼠标切换的话 keyboard idle 时间不更新.                 ;  取余是最简单的,不用记录之前是哪个程序,和现在比较.   取余一定要用 后面的 100 ms,而不是开始的 100 ms,不然总是重置 IME.
 
-    if( t > 300 ){
-        ; change_this_program_perfer() 
-        global modifier
-        modifier := ""
-        ; showIMEstateRIME()
-    }
+    ; if( t > 300 ){
+    ;     ; change_this_program_perfer() 
+    ;     global modifier
+    ;     modifier := ""
+    ;     ; showIMEstateRIME()
+    ; }
 
 
-    if( A_TimeIdleKeyboard > 1600 )
-        {
-            M_altered_wait_click := 0
-            ToolTip(  ,0 ,  ypos+ 200,9 )
+    ; if( A_TimeIdleKeyboard > 1600 )
+    ;     {
+    ;         M_altered_wait_click := 0
+    ;         ToolTip(  ,0 ,  ypos+ 200,9 )
             
-    }
-
-    
-
-
+    ; }
 
 
     ; if( t > threshold_idle - 100 ){    时间过长修改输入就太影响输入思路了，鼠标、换程序时修改最好。
@@ -405,13 +435,13 @@ WatchCursor()
     ; else {
     ;     flag_idle_space := 0
     ; }
-    ; -----------------------  闲置足够长时间就清除 modifer---------------------
+    ; -----------------------  闲置足够长时间就清除 modifer-------------------
    
 
 
     ; ToolTip(A_ScreenHeight ypos xpo )
     if( GetKeyState("Ctrl","P"))
-        if(  (xpos = 0 ))   ;and  ypos = A_ScreenHeight -1    往左拖动触发删除，这样鼠标可以直接拖动文字。
+        if(  (xpos = 0 ))   ;and  ypos = A_ScreenHeight -1    往左拖动(同时按住 ctrl）触发删除，这样鼠标可以直接拖动文字复制、移动、删除。
             {
                 Send("{LButton Up}")
                 Send("{BackSpace}")
@@ -427,13 +457,61 @@ WatchCursor()
     ; ToolTip,x:%xpos% y:%ypos% :%% `t  Hei =  %Hei%  Wei =%Wei%
     
     ; -----------------------
+    ; tooltip, %A_ScreenWidth%
 
     ; 根据鼠标在 screen 的位置修改鼠标滚轮的功能。               ; 副屏幕坐标是负的，整个屏幕的基准不是 0；副屏幕左上角是 -1440,661 
-    ; if(!GetKeyState("LButton")){ ;没有按下鼠标才触发。
-        
-        ; tooltip, %A_ScreenWidth%
-        
+    ; if(GetKeyState("LButton")){   ;没有按下鼠标才触发。
+    if(GetKeyState("``")){          ;没有__`__才触发。  但是这个规则没有用？和上条不一样？
+    ; if(GetKeyState("SC029")){     ;没有__`__才触发。  但是这个规则没有用？和上条不一样？
+        return
+    }
 
+        
+     
+        ; 滚轮控制音量                              else if ↓↓↓  ypos < H * 0.25 or
+        if( xpos = 0 and ( ypos > H * 0.75  )  or (   xpos = -1440 and ypos < 900)){   ;屏幕左上角, 左下角，副屏幕。
+                flag_mouse_wheel_change :=3
+                ToolTip("滚轮控制音量" xpos , A_ScreenWidth,,15)
+                ToolTip()
+        }
+
+        ; 左上角   ;切换上一个任务  alt+Tab
+        ; else if(xpos = 0 and ypos = 0){
+        ;     Sleep( 1000)
+        ;     ;if still here
+        ;     MouseGetPos(&xpos, &ypos, &id, &control)
+        ;     if(xpos < 50 and ypos < 50){
+        ;             Send("!{Tab}")  
+        ;             Sleep( 1000)
+        ;         }
+        ; }    
+        
+        ;  ; 右上角    F11 或者切换任务   已经设置了『全面屏手势』，就不用这个了。
+        ; else if(xpos + 1 = A_ScreenWidth and ypos = 0){
+
+        ;     Sleep( 1000)
+        ;     ;if still here
+        ;     MouseGetPos(&xpos, &ypos, &id, &control)
+        ;     if( Abs( A_ScreenWidth - xpos) < 50 and ypos < 50){
+        ;             Send("#{Tab}")      ;切换任务    任务管理器
+        ;             ; Send("{F11}")
+        ;             Sleep( 1000)
+        ;         }
+        ; }
+
+        ;     ;屏幕右边直接控制翻页  条件较小的一定要放右边！！
+        else if( xpos = A_ScreenWidth - 1 ){   
+            flag_mouse_wheel_change := 4
+            ToolTip("PG", A_ScreenWidth,,15)
+        }
+
+        else {  ;重置状态  ，必须要
+            if( flag_mouse_wheel_change != 0){
+                flag_mouse_wheel_change :=0
+                ToolTip(,,,15)
+            }
+        }
+;  ----------------------------------放弃---------------------------------
         ; 浏览器标签，上方，快速切换。 稍微往下，第二行，第三行，屏幕左侧 75% 调音量，右侧控制翻页，功能都有。
         ; if (  (xpos > 250 and  xpos < W-250 )) {
         ;     ; 屏幕中央，去除两侧，避免 bug
@@ -461,54 +539,15 @@ WatchCursor()
         ;         flag_mouse_wheel_change :=1
         ;         ToolTip("屏幕左上方 1 滚轮控制翻页   `n 右键打开 ↑任务菜单全部任务↑ ", A_ScreenWidth,,15)
         ; }
-        
-        ; 滚轮控制音量                              else if ↓↓↓  ypos < H * 0.25 or
-        if( xpos = 0 and ( ypos > H * 0.75  )  or (   xpos = -1440 and ypos < 900)){   ;屏幕左上角, 左下角，副屏幕。
-                flag_mouse_wheel_change :=3
-                ToolTip("滚轮控制音量", A_ScreenWidth,,15)
-                ToolTip()
-        }
+         ;  mousinc 这个鼠标手势软件有很多功能，https://zhuanlan.zhihu.com/p/400590907  绿色，
+        ; 手写识别，carnac 按键回显，边缘滚动，有意思的音响效果，甚至 altsnap 移动窗口（只不过是 alt + 鼠标滚轮，而我这个鼠标没有滚轮。）、 ditto 的画中画都有！
+;  ----------------------------------放弃---------------------------------
 
-                    ; 左上角   ;切换任务
-        else if(xpos = 0 and ypos = 0){
-            Sleep( 1000)
-            ;if still here
-            MouseGetPos(&xpos, &ypos, &id, &control)
-            if(xpos < 50 and ypos < 50){
-                    Send("!{Tab}")  
-                    Sleep( 1000)
-                }
-        }
-        
-         ; 右上角 
-        else if(xpos + 1 = A_ScreenWidth and ypos = 0){
 
-            Sleep( 1000)
-            ;if still here
-            MouseGetPos(&xpos, &ypos, &id, &control)
-            if( Abs( A_ScreenWidth - xpos) < 50 and ypos < 50){
-                    ; Send("#{Tab}")      ;切换任务    任务管理器
-                    Send("{F11}")
-                    Sleep( 1000)
-                }
-        }
-
-            ;屏幕右边  条件较小的一定要放右边！！
-        else if( xpos = A_ScreenWidth - 1 ){   
-            flag_mouse_wheel_change := 4
-            ToolTip("PG", A_ScreenWidth,,15)
-        }
-
-        else {  ;重置状态
-            if( flag_mouse_wheel_change != 0){
-                flag_mouse_wheel_change :=0
-                ToolTip(,,,15)
-            }
-        }
-
+;---------------------------------------------------------
  
         ; else if(xpos = 0 and ypos = H){
-        ;     tooltip, 屏幕左下角  如果还在这里 still here `n 那么触发。。。左下角  0 1079    W L 这些都设置成全局变量了，不用引用直接使用。, W 
+        ;     tooltip, 屏幕左下角  如果还在这里 still here `n 那么触发。。。左下角  0 1079    W L 
         ;     Sleep, 1000
     
         ;     MouseGetPos, xpos, ypos, id, control
@@ -527,11 +566,25 @@ WatchCursor()
         ;        
     ; }
 
-    global XwhereMwas := xpos
-    global YwhereMwas := ypos
+   
 }
 
-   
+AutoMaticPomodoro()
+{
+
+if(  A_TimeIdlePhysical < 60000 )   ;1 minutes = 60*1000 ms 函数里面自动过滤掉太远的输入，只需要进入的时候过滤一下。
+    {
+        My_automatic_Pomodoro_Stop_Sitting_function_couting_up()
+    }
+
+else if( A_TimeIdlePhysical > 300000)
+    {
+    Pomodoro_Kill()   ; 太长的空闲，重置计数器。
+    global Stop_Sitting_block_once
+    Stop_Sitting_block_once := 1
+    ToolTip("Clear",0,0)
+}
+}
 ; ~Tab::                  
 ; ~LButton::showIMEstateRIME()          陈饭FDSFshUIFFDSFhsDhui
 
@@ -586,9 +639,9 @@ global flag_mouse_wheel_change
 }
 
 #HotIf flag_mouse_wheel_change=4
+; 全面屏手势，鼠标在屏幕右侧时，唤出任务菜单。（按住显示，松手选择）
 RButton::
 {
-    
     Send("#{Tab}")
     KeyWait("RButton")   
     Click()
@@ -613,7 +666,8 @@ func_delete_traling_newline_and_enter(){
 ;注意空格就可以连接字符串！
 showtip( string,t:=500){
     ToolTip(string)
-    SetTimer(RemoveToolTip,-%t%)
+    SetTimer () => ToolTip( ), -300000  
+    ; SetTimer(RemoveToolTip,-%t%)
 }
 
 delete_one_line(){
@@ -653,6 +707,33 @@ func_underscript_text(){
     Send("{Left}")
     return
 }
+
+
+; ~ki
+~k::
+{
+    ; check_io_pressed_in_the_same_time()
+    ; if( GetKeyState("j") and GetKeyState("i") and GetKeyState("o")dededeededeeedede
+    if( GetKeyState("i")){
+        Send("{bs 2}")
+        Sleep(200)
+        cn()
+        
+        
+    } 
+        
+}
+; ~ed
+~d::
+{
+    ; check_ew_pressed_in_the_same_time()   
+    if(  GetKeyState("e") and GetKeyState("d")  ){
+        Send("{bs 2}")
+        Sleep(200)
+        en()
+    } 
+}
+
     
 
 
@@ -807,7 +888,7 @@ Lshift & WheelUp::Send("{WheelLeft}")
 ; pomodoro 
 F3 & p::   
 {  
-    repeatTime:=  updateSharedRepeat(" pomodoro 开始,关闭时钟")
+    repeatTime:=  updateSharedRepeat(" pomodoro 开始,关闭时钟   并清空自动时钟")
         switch repeatTime
         {
         case 0:     PomodoroStart()
@@ -825,6 +906,7 @@ MenuHandler4(ItemName, ItemPos, MyMenu) {
 
 MenuHandler5(ItemName, ItemPos, MyMenu) {
     Pomodoro_Kill()
+    global blockPomodoro:= 1
 }
 
 PomodoroStart()
@@ -839,7 +921,8 @@ SetTimer(endPomodoro,-1500200)  ;负数是倒计时关闭。  正数是周期提
 Pomodoro_Kill()
 {
     SetTimer(pomodoro_tips,0)  ; 删除 Pomodoro 时钟
-
+    global Stop_Sitting_counter  ;把另一个自动的重置
+    Stop_Sitting_counter :=0
 }
 
 pomodoro_tips()
@@ -879,31 +962,6 @@ return
 
 
 
-; 把之前的字退回，重新送给 IME。
-regretChangeIME_EtC(){ 
-    ; ClipSaved  := ClipboardAll()
-    Send("^+{Left}{sleep 550}^{x}")
-    Sleep(500)
-    retype_text := A_Clipboard       ; Convert to text
-    retype_text := RTrim(retype_text , " ")
-
-    cn()
-    ; ToolTip("A_Clipboard = " A_Clipboard  )
-    SendMode "Input"
-    ;手心输入法有 bug , 怎么调都没用一定会丢失第二个字符,不如 自己实现一个 send 函数。
-    ; SetKeyDelay(100)
-    ; Send(retype_text)
-    ; ; SetKeyDelay, 1000, 50   
-    ; SetKeyDelay(0)
-
-    Send_with_delay( retype_text )
-
-
-
-    ; A_Clipboard := ClipSaved            ; Restore original ClipBoard
-    ClipSaved := ""  ; Free the memory in case the clipboard was very large.
-
-}
 Send_with_delay( retype_text ){
     ToolTip( StrLen(retype_text) ) 
     loop(StrLen(retype_text))
@@ -949,7 +1007,6 @@ F9 & q::Send("^{q}")
 
 switch_to_a_program(titile_names, custom_behavior := False){
     SetTitleMatchMode(2)
-    ; 全局变量处理化必须放在文件的最开始！！ global n_time:=1
     global n_time
     global exclude_apps_string
     global repeat_key
@@ -1001,10 +1058,6 @@ switch_to_a_program(titile_names, custom_behavior := False){
         }
         return
     }
-    else {
-        showtip(%A_TimeIdleKeyboard%)  
-
-    }
 
     is_found :=0
     for index, element in titile_names ; Enumeration is the recommended approach in most cases.
@@ -1047,35 +1100,137 @@ global temporal_change_IME :=0
 
 
 
-Capslock::
-{ 
-    SetCapsLockState("AlwaysOff")
-    ; clear_mouse_flag_altered()
-    ; Send("{Esc}")
-    ;  vim user ↑↑↑ 
-    en()
-    ; MsgBox("aaa")
-    ; checkCurrentKeyboardLayout() 
+Capslock::Func_flip_IME_state()
+Shift::Send("{Shift}")  ; 通过多余的一次, 屏蔽 shift.  dfdf
+; Capslock::Send("^{Space}")
+; ~Capslock::
+; { 
+;     SetCapsLockState("AlwaysOff")
+   
 
-    ; 加上这个之后，移动鼠标能还原 IME 的状态。
-    ; global temporal_change_IME
-    ; temporal_change_IME :=1
-    ; 加上这个之后，移动鼠标能还原 IME 的状态。
+;     count:=0
+;     while(getkeystate("Capslock","p"))
+;     {
+;         count++
+;         ; ToolTip(count)
+;         sleep 50
+;     }
+;     if(count<5)
+;         en()
+;     else
+;         cn()
+    
+;     BlockInput("Off")
+;     ; SoundBeep()
+; }
 
-    ; regretChangeIME_EtC()
-    ; Func_flip_IME_state()
+
+; Shift::smartVimCN()
+; Shift::smartVimCN()
+; /sc033	逗号    sc034 句号
+; $^sc033::cn()
+; $^,::en()   bug 没用
+; RAlt::cn()
+Esc::
+{
+    Send("{Esc}")
+    ; en()
+    ToolTip()
 }
-RAlt::cn()
-~Esc::en()
+; Pause::Send("{Delete}")  ;下面的语法才是完全重映射。
+Pause::Delete
+
+; #HotIf WinActive("ahk_exe msedge.exe")
+; #HotIf
+
+IMEtoggle(){
+en("ctrl+space") 
+}
+                      
+; $Space::
+; {
+;     Send("{Space}")
+;     ret := KeyWait("Space","Up T1")   
+;     if( ret := 0)
+;      Send("{BackSpace}")
+;     ; KeyWait("Space","Up")   
+; }                          
+
+; 按住 shift 太长时间，不小心切换输入法  。 但是 shift+↑←↓→ 也会统计进去。  
+; ~$Shift::
+; {
+;     count:=0
+;     while(getkeystate("Shift","p"))
+;     {
+;         count++
+;         sleep 50
+;     }
+;     if(count>5)
+;     {
+;         ToolTip(A_TimeSincePriorHotKey)
+;         Send("{Shift}")  ; 把它切回来，但不能阻止他
+;     }
+; }
 
 
+; // 第二种写法也不能提前进入计时器。
+; *LShift::
+; {
+;     global shift_press_time
+;     while(getkeystate("Shift","p"))
+;     {
+;         shift_press_time++
+;         sleep 50
+;         ToolTip(shift_press_time)
+;     }
+    
+; }
+; global shift_press_time :=0
+; *LShift UP::
+; {
+;     global shift_press_time
+;     if(shift_press_time<5)
+;         {
+;             ToolTip(shift_press_time)
+;             Send("{Shift}")  ; 把它切回来，但不能阻止他
+;         }
+
+; }
+
+
+
+
+;     global shiftTick :=0
+; $LShift Up::
+; {
+;     global shiftTick
+
+;     ToolTip(A_TickCount - shiftTick )
+;     ; if(shiftTick - A_TickCount < 200)
+;     ; ToolTip("ffff")
+; }
+
+
+;  LCtrl::cn() 这个不能要
+
+smartVimCN(){
+    if WinActive("ahk_exe Obsidian.exe"){   ; 这个笔记本里才生效，其他软件不生效。  encn 切换及时 vim 状态错了也会被冲刷掉。
+        en()
+        Send("{i}")
+        cn()       
+    }
+    else {
+        cn()
+    }
+}
+  
 
 ; 清除鼠标滚轮打上的标记。
 clear_mouse_flag_altered() 
 {
     global M_altered_wait_click 
     M_altered_wait_click := 0  
-    ToolTip(,0,9999,9 ) 
+    ToolTip(,0,0,9 ) 
 }
 ; ^space::Func_flip_IME_state()
 ~BackSpace::clear_mouse_flag_altered() 
@@ -1089,31 +1244,12 @@ clear_mouse_flag_altered()
 ;         Send("{Space}")        
 ;     else
 ;         {
-;             Func_Set_Language(9) 
+;             xxxx(9) 
 ;             KeyWait("Space")   ;  不加的话，会进入 “if”，多一个空格。   
 ;         }
 ; }
 
-
-; Shift::
-; {
-;     global Current_IME_State
-;     Current_IME_State := 3 - Current_IME_State  
-;     ; 没法实现阻塞，↑↑ 这段必须加         e.g.  +：： Send("aaa") 还会切换，只能结束后再放回来。
-    
-;     ; if( A_PriorHotkey != A_ThisHotKey or A_TimeSincePriorHotKey  > 1000)
-;     ;     cn()
-;     ; if( A_PriorHotkey == A_ThisHotKey and A_TimeSincePriorHotKey  < 300)
-;     ;     regretChangeIME_EtC()
-    
-
-
-; }
-; +1::Send("combained")
-
-
-
-
+ 
 
 RemoveToolTip()
 { 
@@ -1279,20 +1415,20 @@ url_go(string){  ; url_go("")
     }
 }
 
+; 个人资料-南昌航空大学统一身份认证 (nchu.edu.cn)  ; url_go("http://passport.nchu.edu.cn/main.aspx?action=Srun_Login")
 go_school_online()
 {
-    ; 个人资料-南昌航空大学统一身份认证 (nchu.edu.cn)
-    ; ↑↑ http://passport.nchu.edu.cn/main.aspx?action=Srun_Login
-    ; url_go("http://passport.nchu.edu.cn/main.aspx?action=Srun_Login")
-    
-    url_go(" http://login.network.nchu.edu.cn/srun_portal_pc?ac_id=1&theme=pro")
+    ; url_go(" http://login.network.nchu.edu.cn/srun_portal_pc?ac_id=1&theme=pro") ; 这个网址总是加载不出来！
+    url_go("http://10.1.88.4/srun_portal_pc?ac_id=1&theme=pro")
     SS()
     SS("f")
     SS("e")
 }
 
 go_school_offline(){
-    url_go(" http://login.network.nchu.edu.cn/srun_portal_pc?ac_id=1&theme=pro")
+    ; url_go(" http://login.network.nchu.edu.cn/srun_portal_pc?ac_id=1&theme=pro") ; 这个网址总是加载不出来！
+    ; url_go("http://10.1.88.4/srun_portal_pc?ac_id=1&theme=pro")  ; 这两都行，下面这个是已经成功的，少一个跳转。
+    url_go("http://10.1.88.4/srun_portal_success?ac_id=1&theme=pro")
     SS()
     SS("f")
     SS("a")
@@ -1311,7 +1447,9 @@ SS( a:="" ){
 
 }
 
-CapsLock & 8::recorder()
+
+
+CapsLock & F8::recorder()
 recorder(){
        ; Hotkey, Capslock, Off
     ; Input, keystrokes, V, {Capslock}
@@ -1351,7 +1489,7 @@ return_last_combined_key()
 
 }
 
-; 等待并返回按键 ； Same again, but don't block the key.  KeyWaitAny("V")
+; 等待并返回按键 ； but don't block the key.  KeyWaitAny("V")
 KeyWaitAny(Options:="")
 {
     ih := InputHook(Options)
@@ -1561,30 +1699,58 @@ change_to_en_and_put_stringSpace(){
     Send("{Space}")
 }
 
-; eng   向左，剪切，切换 chn，发送。
-;  手心输入法有问题，最后发送一定会丢失第二个字符串。需要单独发送每个字母
+; 把之前的字退回，重新送给 IME。  
 change_to_chn_and_retype(){
-    cn()
-    Send("^+{Left}")
-    Sleep(100)
+    Send("{Ctrl Up}{Shift down}{Shift Up}") ; 提前发一个 ctrl 抬起避免 ctrl+shift；  shift to flip IME_state 
+    Sleep(50)
+    Send("^+{Left}") ;  eng 向左，剪切，切换 chn，发送。Send（“Left”） ；  English向左，剪切，切换 chn
+    ClipSaved := ClipboardAll()   ; Save the entire clipboard to a variable of your choice.    ToolTip(ClipSaved)
+    A_Clipboard := "" ; Empty the clipboard
     Send("^{x}")
-    Sleep(100)
-    ; Send( A_Clipboard )  ;  这里有问题 ;  手心输入法有问题，最后发送一定会丢失第二个字符串。需要单独发送每个字母
+    ClipWait()  ; 等待剪切板有东西. 必须保留.
 
     stringRetype := Trim(A_Clipboard," ")
-    ; 自己实现延迟 ↓
+    ; Send(  )  ;    ;  手心输入法有问题，最后发送一定会丢失第二个字符串。需要单独发送每个字母这里有问题 ;  手心输入法有问题，最后发送一定会丢失第二个字符串。需要单独发送每个字母
+    ; 自己实现延迟发送 clipboard 里面的数据 ↓
     loop parse stringRetype     ;  each character of the input string will be treated as a separate substring.
         {
+            if( A_LoopField == "`n")
+                break
             Send(A_LoopField)
-            Sleep(50)
-            ; SetKeyDelay(150,150,)  ; 这种写法没用，感觉是在最后加了一个延迟 ，而不是每个字符之间加了一个延迟。
-
+            Sleep(50)  
         }
+
+    A_Clipboard := ClipSaved   ; Restore the original clipboard. Note the use of A_Clipboard (not ClipboardAll).
+    ClipSaved := ""   ; Free the memory in case the clipboard was very large.
 }
 
+ ; if(StrLen(A_Clipboard) >30)   return 0
+; SetKeyDelay(150,150,)  ; 这种写法没用，感觉是在最后加了一个延迟 ，而不是每个字符之间加了一个延迟。
+;
+regretChangeIME_EtC(){ 
+    ; ClipSaved  := ClipboardAll()
+    Send("^+{Left}{sleep 550}^{x}")
+    Sleep(500)
+    retype_text := A_Clipboard       ; Convert to text
+    retype_text := RTrim(retype_text , " ")
+
+    cn()
+    ; ToolTip("A_Clipboard = " A_Clipboard  )
+    SendMode "Input"
+    ;手心输入法有 bug , 怎么调都没用一定会丢失第二个字符,不如 自己实现一个 send 函数。
+    ; SetKeyDelay(100)
+    ; Send(retype_text)
+    ; ; SetKeyDelay, 1000, 50   
+    ; SetKeyDelay(0)
+
+    Send_with_delay( retype_text )
 
 
 
+    ; A_Clipboard := ClipSaved            ; Restore original ClipBoard
+    ClipSaved := ""  ; Free the memory in case the clipboard was very large.
+
+}
 global VyVi := 0
 global Iivi := 0
 
@@ -1626,69 +1792,67 @@ global Iivi := 0
 
 ; 记录 stopsitting 小工具的时间，并显示在屏幕右上角
 ;  函数内过滤太近的输入
+global Stop_Sitting_block_once := 0
+global blockPomodoro:= 0
 My_automatic_Pomodoro_Stop_Sitting_function_couting_up(){
+    global blockPomodoro
+    if(blockPomodoro == 1)
+        return 
     global Stop_Sitting_counter
     global Stop_Sitting_Lastime_triggered
-    
-    total_minius := 25       ; pomodoro 时长;
-    time_gap := 15 * 1000  ; 最小检测时长,推荐 15s 到一分钟， 如果 1 s 一次检测的话，工作的时间没有被记录上。 20Min 需要 35 Min 触发。
+    global Stop_Sitting_block_once
+    total_minius := 20       ; pomodoro 时长;
+    time_gap := 15 * 1000  ; 最小检测时长,推荐 15s 到一分钟。如果间隔太短一次检测的话，工作的时间没有被记录上。 20Min 需要 35 Min 触发。
     dt := A_TickCount - Stop_Sitting_Lastime_triggered 
     jigger := A_TimeIdlePhysical
     if( dt > time_gap )
     {
-
+        if( dt > 300000)
+            Stop_Sitting_counter:=0    ; 太长的空闲，重置计数器。
+        if( Stop_Sitting_block_once == 1){
+            Stop_Sitting_block_once := 0
+            return
+        }
         Stop_Sitting_Lastime_triggered:= A_TickCount
-        Stop_Sitting_counter +=  time_gap
+        Stop_Sitting_counter += dt
         ; ToolTip("+" Stop_Sitting_Lastime_triggered "`n" Stop_Sitting_counter  , 200,,3)
         ElapsedTime := Stop_Sitting_counter
         sec := Floor(ElapsedTime/1000)
         minute := Floor(sec / 60)
         CoordMode("ToolTip" , "Screen")
-        ToolTip(minute ":" sec,   A_ScreenWidth/2 ,  0, 16)
+        MouseGetPos(&xpos, &ypos, &id, &control)
+        ; ToolTip(minute ":" sec,   A_ScreenWidth ,  0, 16)
+        ToolTip(minute ":" sec,  A_ScreenWidth  , ypos, 16)
     }
 
     
     if( Stop_Sitting_counter > total_minius * 60 * 1000  ){
-        ; MsgBox("Get Up！")
-        Stop_Sitting_counter:= 0 
-        Stop_Sitting_Lastime_triggered:=A_TickCount
-
-        ; Send("#^{c}")
-            result := MsgBox("Get Up！ `n End this work & take a walk ? Yes to clear",, "Y/N T300")
-            if (result == "Timeout")
-            {
-                SoundBeep()
-                result := MsgBox("Get Up！ `n End this work & take a walk ? Yes to clear",, "Y/N T300")
-                if (result == "Timeout")
-                {
-                    SoundBeep()
-                }
-            }
-            else if(result == "Yes"){
-                Stop_Sitting_counter:= 0 
-                Stop_Sitting_Lastime_triggered:=A_TickCount
-                My_automatic_Pomodoro_Stop_Sitting_function_Reset()
-                ; Send("#^{c}")
+            
+            result := MsgBox("Get Up！ `n Yes to End this work & take a walk  `n No to clear remind me short after",, "Y/N ")
+            if(result == "Yes"){
+                clear_and_wait_for_new_run_automatic_Pomodoro_Stop_Sitting_function_Reset()
+                Send("#^{c}")
             }
             else if(result == "No"){
-                Stop_Sitting_counter:= 0 
+                Stop_Sitting_counter := Stop_Sitting_counter * 0.9
                 Stop_Sitting_Lastime_triggered:=A_TickCount
-                ; Send("#^{c}")
             }
-        }
-        
+        }  
+         
         
 }
 
 
-My_automatic_Pomodoro_Stop_Sitting_function_Reset(){
+clear_and_wait_for_new_run_automatic_Pomodoro_Stop_Sitting_function_Reset(){
     global Stop_Sitting_counter
     global Stop_Sitting_Lastime_triggered
     Stop_Sitting_counter:= 0 
     Stop_Sitting_Lastime_triggered:=A_TickCount
     ToolTip( , 100,,2)
-    SetTimer () =>  MsgBox("New Run"), -60000   
-    ; SetTimer () =>   Send("#^{c}")   , -300000   ;  5 minus Good to Sit Back.
+    SetTimer () =>  tooltip("rest enough for 5 min") , -30*10 *1000    ;  5 minus Good to Sit Back.
+    SetTimer () =>  Send("#^{c}")                   , -30*10 *1000    
+    SetTimer () =>  tooltip("rest enough for 10 min"), -60*10 *1000    ;  10 minus Good to Sit Back.
+    SetTimer () =>  Pomodoro_Kill()                 , -60*10 *1000   
 }
 
 
@@ -1703,6 +1867,8 @@ VirgoRight(){
     Send("!{" cVE "}")
 
 }
+
+
 
 virgoLeft(){
     global cVE
@@ -1723,28 +1889,6 @@ WinRotate(ver){
 
 
 
-
-; 命令行切换输入法工具！终于找到了！
-; 项目地址： https://github.com/ALONELUR/vim-im-select-obsidian
-; （因为 vim 需要 esc 之后返回英文：需要这个更小的项目：
-; https://github.com/daipeihust/im-select
-; ↑↑ ↓↓
-; 中文是 2052，英文是 1033，这个小工具能查询编号，切换语言！
-
-; 切换到 微软拼音
-; c1560@DESKTOP-BUDFFQN MINGW64 /d/Win/Download
-; $ ./im-select
-; 2052 
-
-;  切换到英文
-; c1560@DESKTOP-BUDFFQN MINGW64 /d/Win/Download
-; $ ./im-select
-; 1033
-
-; 切换到 RIME
-; c1560@DESKTOP-BUDFFQN MINGW64 /d/Win/Download
-; $ ./im-select
-; 2052
 
 
 
